@@ -1,5 +1,5 @@
 /* 备考兔 · 上岸工作台 — Service Worker（离线缓存 + 加到主屏） */
-const CACHE = 'shangan-v2.1';
+const CACHE = 'shangan-v2.4';
 const ASSETS = [
   './',
   './index.html',

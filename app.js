@@ -1163,13 +1163,13 @@ const applyFont = () => {
 };
 
 /* ---------- 侧栏（移动端） ---------- */
-const openSidebar = () => { $('#sidebar').classList.add('nav-open'); $('#backdrop').classList.add('show'); };
-const closeSidebar = () => { $('#sidebar').classList.remove('nav-open'); $('#backdrop').classList.remove('show'); };
+const openSidebar = () => { document.body.classList.add('nav-open'); $('#backdrop').classList.add('show'); };
+const closeSidebar = () => { document.body.classList.remove('nav-open'); $('#backdrop').classList.remove('show'); };
 
 /* ---------- 事件 ---------- */
 const bindEvents = () => {
   $$('.nav-item').forEach(el => el.addEventListener('click', (e) => { e.preventDefault(); navigate(el.dataset.route); }));
-  $('#hamburgerBtn').addEventListener('click', () => { if ($('#sidebar').classList.contains('nav-open')) closeSidebar(); else openSidebar(); });
+  $('#hamburgerBtn').addEventListener('click', () => { if (document.body.classList.contains('nav-open')) closeSidebar(); else openSidebar(); });
   $('#backdrop').addEventListener('click', closeSidebar);
 
   $('#addExamBtn').addEventListener('click', addExam);
