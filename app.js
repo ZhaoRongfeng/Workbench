@@ -1348,12 +1348,42 @@ const setSyncStatus = (txt) => {
   if (mini) mini.textContent = (state.sync.enabled ? '☁️ 云端' : '本机保存');
 };
 
+// 判断一份 state 是否含有真实学习数据（用于防止空数据覆盖云端）
+const stateHasContent = (s) => {
+  if (!s) return false;
+  if (s.plans && s.plans.length) return true;
+  if (s.errors && s.errors.length) return true;
+  if (s.stats && s.stats.length) return true;
+  if (s.politicsToday && s.politicsToday.length) return true;
+  if (s.checkins && Object.keys(s.checkins).length) return true;
+  if (s.notes && Object.keys(s.notes).length) return true;
+  if (s.studyPlan && Object.keys(s.studyPlan).length) return true;
+  const p = s.progress || {};
+  for (const k of Object.keys(p)) if (Object.keys(p[k] || {}).length) return true;
+  return false;
+};
+
 const pushToCloud = async () => {
   if (!state.sync.enabled || !state.sync.url || !state.sync.anonKey || _syncing) return;
   _syncing = true;
   try {
     const payload = xorCrypt(JSON.stringify(state), state.sync.code);
     const base = state.sync.url.replace(/\/$/, '');
+    // 安全网：本机几乎无数据、云端却有数据时，先确认，避免误点「上传」把云端清空
+    try {
+      const chk = await fetch(`${base}/rest/v1/workspace_sync?id=eq.main&select=data`, { headers: supaHeaders() });
+      if (chk.ok) {
+        const arrChk = await chk.json();
+        if (arrChk.length) {
+          let remoteState = null;
+          try { remoteState = JSON.parse(xorDecrypt(arrChk[0].data, state.sync.code)); } catch (_) { remoteState = null; }
+          if (remoteState && stateHasContent(remoteState) && !stateHasContent(state)) {
+            const go = confirm('⚠️ 本机几乎没有学习数据，但云端已有数据。\n\n继续上传会用【本机空白数据】覆盖云端！\n\n若你是想在新设备上获取已有数据，请点「取消」，然后改点「手动下载」。\n\n确定仍要上传吗？');
+            if (!go) { setSyncStatus('已取消上传（已保护云端数据）'); toast('已取消上传，云端数据未被覆盖'); return; }
+          }
+        }
+      }
+    } catch (_) { /* 探测失败不阻断正常上传 */ }
     const headers = { ...supaHeaders(), 'Prefer': 'resolution=merge-duplicates' };
     let res = await fetch(`${base}/rest/v1/workspace_sync?id=eq.main`, {
       method: 'PATCH', headers, body: JSON.stringify({ data: payload, updated_at: new Date().toISOString() })
