@@ -1337,6 +1337,16 @@ const supaHeaders = () => ({
   'Authorization': 'Bearer ' + state.sync.anonKey,
   'Content-Type': 'application/json'
 });
+// 从 Supabase 错误响应中提取具体原因（如 Invalid API key），便于定位 401/404 等问题
+const supaErrMsg = async (res) => {
+  let detail = '';
+  try {
+    const j = await res.json();
+    const m = j && (j.msg || j.message || j.error_description || j.error);
+    if (m) detail = '：' + m;
+  } catch (_) {}
+  return 'HTTP ' + res.status + detail;
+};
 const fmtNow = () => {
   const d = new Date(), p = (n) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
@@ -1396,7 +1406,7 @@ const pushToCloud = async () => {
         method: 'POST', headers, body: JSON.stringify({ id: 'main', data: payload, updated_at: new Date().toISOString() })
       });
     }
-    if (!res.ok && res.status !== 409) throw new Error('HTTP ' + res.status);
+    if (!res.ok && res.status !== 409) throw new Error(await supaErrMsg(res));
     state.sync.lastSync = fmtNow();
     setSyncStatus('☁️ 已上传 ' + state.sync.lastSync);
   } catch (e) {
@@ -1412,7 +1422,7 @@ const pullFromCloud = async () => {
   try {
     const base = state.sync.url.replace(/\/$/, '');
     const res = await fetch(`${base}/rest/v1/workspace_sync?id=eq.main&select=data,updated_at`, { headers: supaHeaders() });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    if (!res.ok) throw new Error(await supaErrMsg(res));
     const arr = await res.json();
     if (!arr.length) { toast('云端暂无数据，请先上传'); return; }
     const remote = xorDecrypt(arr[0].data, state.sync.code);
@@ -1453,7 +1463,7 @@ const testSync = async () => {
   try {
     const base = url.replace(/\/$/, '');
     const res = await fetch(`${base}/rest/v1/workspace_sync?id=eq.main&select=id`, { headers: { 'apikey': key, 'Authorization': 'Bearer ' + key } });
-    setSyncStatus(res.ok ? '✅ 连接成功' : '⚠️ 连接失败 HTTP ' + res.status);
+    setSyncStatus(res.ok ? '✅ 连接成功' : '⚠️ 连接失败 ' + await supaErrMsg(res));
   } catch (e) { setSyncStatus('⚠️ 连接失败：' + e.message); }
 };
 const syncDisconnect = () => {
