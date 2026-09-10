@@ -1,0 +1,11 @@
+# Netlify 部署配置
+# 用法：把本目录拖拽到 https://app.netlify.com 的 "Deploy manually"，
+# 或在 Netlify 连接本 GitHub 仓库即可。无需构建步骤（纯静态站点）。
+[build]
+  publish = "."
+
+# 纯 hash 路由（#countdown 等），无需 SPA rewrite；此处仅确保 Service Worker 不被强缓存
+[[headers]]
+  for = "/service-worker.js"
+  [headers.values]
+    Cache-Control = "no-cache"

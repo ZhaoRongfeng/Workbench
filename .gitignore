@@ -1,0 +1,6 @@
+# 本地开发辅助文件，无需发布
+prev-*.png
+.workbuddy/
+.DS_Store
+Thumbs.db
+__pycache__/

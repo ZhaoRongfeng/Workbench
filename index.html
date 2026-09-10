@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="hZCguEU4CIbrR9uQJzSgJB">
+<head data-page-node-id="Ew1olDP3ZXDGxau5nBPRgU">
+  <meta charset="UTF-8" data-page-node-id="QSGohOpKTN5uaDRmK1KGRK">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" data-page-node-id="DABMCj3VJ2CMrcRQDuKmkz">
+  <meta name="theme-color" content="#f8f1e8" data-page-node-id="QtkXFUX1UlvOOaIKLBxFce">
+  <title>🐰 备考兔 · 上岸工作台</title>
+  <link rel="stylesheet" href="styles.css" data-page-node-id="xd5SCdVeghWk2e9I10GVL6">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%90%B0%3C/text%3E%3C/svg%3E" data-page-node-id="FcVPwEDvHAVxAUZQekbUeM">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body data-font="m" data-page-node-id="tHONzWGRms1FgnDxQBxwwT">
+
+  <!-- 顶部条 -->
+  <header class="topbar" data-page-node-id="kVPmXEW4Hj30PMjDsjmk3f">
+    <button class="hamburger" id="hamburgerBtn" aria-label="菜单" data-page-node-id="EKwD4Dt4stuERFIBEsd2De">
+      <span data-page-node-id="iDQDfRMTXkWdxKNRnjh3fd"></span><span data-page-node-id="MJ6TM59EFOIJmRS2dYUYF3"></span><span data-page-node-id="ZZZrJ0pAtcG7NcvAgMsF5n"></span>
+    </button>
+    <div class="brand" data-page-node-id="qhFDd5Nw63JyLBBah2CwLo">
+      <span class="brand-icon" data-page-node-id="iXbBsiPaKBlPA2KcdZv4m6">🐰</span>
+      <span class="brand-text" data-page-node-id="7OByg35dv2ThjpIs4DXqHe">备考兔</span>
+    </div>
+    <div class="topbar-right" data-page-node-id="COJEOo81JSmHUWhC3I3N0q">
+      <span class="sync-pill" id="syncPill" title="数据保存状态" data-page-node-id="uwcg2Bi60Ufaleyij2uxDX">🟢 已保存</span>
+      <span class="today-date" id="todayDate" data-page-node-id="g37zKL3ZwYtzU08yD5WZD1"></span>
+      <span class="streak-badge" id="streakBadge" title="连续打卡天数" data-page-node-id="clIW0WsMb9IafLPPLFAjD8">🔥 0</span>
+    </div>
+  </header>
+
+  <div class="layout" data-page-node-id="rwV28FI1kru64c2YDJaEJq">
+    <!-- 左侧导航 -->
+    <aside class="sidebar" id="sidebar" data-page-node-id="VX5CSq6TiCFiXdHGQNoB1d">
+      <!-- 顶部：钉子 + 头像 + 昵称 + 座右铭 -->
+      <div class="side-top" data-page-node-id="lVtMybHJ6VJmse6TxwWE7S">
+        <button class="pin-btn" id="pinBtn" title="固定/折叠导航" data-page-node-id="RcdjGXmwfXu1yHLzfPQBrp">📌</button>
+        <div class="profile" id="profileBox" data-page-node-id="66ofIRg5zAVt2tQJmQUaC7">
+          <div class="avatar-wrap" id="avatarWrap" data-page-node-id="qTMmLnlWBEc1tLmV0PJWqt">
+            <div class="avatar" id="avatar" data-page-node-id="0XySpbomnNIwLzK2ZA5dP5">🐰</div>
+            <div class="avatar-mask" data-page-node-id="ObaFEltG8pMHhtWXuE6Y3M"><span data-page-node-id="IhzAxiNaKDzaUliDvCFT8H">📷</span></div>
+            <input type="file" id="avatarInput" accept="image/*" hidden data-page-node-id="buLJOA0mYI3R8pJS8T5wWD">
+          </div>
+          <div class="profile-info" data-page-node-id="NL8JrimxAk7wuU6m9WdEfz">
+            <div class="nickname" id="nickname" data-page-node-id="ocjNOZvWDSJJi89yinYRPx">备考兔 <span class="edit-ico" data-page-node-id="XFTx1Zj6Uct5EwBH9sjmiV">✏️</span></div>
+            <div class="motto" id="motto" data-page-node-id="RUGk3KeGLClSs6rUZqSDIC">每天进步一点点，上岸就在眼前 ✨</div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="nav" data-page-node-id="ZqgJWs1DQJdXX4GA6jJCZk">
+        <div class="nav-group" data-page-node-id="vJDqhq3DOdoBGLsqzQSVXu">
+          <div class="nav-group-title" data-page-node-id="J39GLfyUSt2SJ1GqVygciO">🌟 核心功能</div>
+          <a class="nav-item" data-route="countdown" data-page-node-id="pHb3iwCLrVDKIZS5B2oAbm">
+            <span class="nav-icon" data-page-node-id="N3O4NkG2Ak6XK1YtZ8EgHk">⏰</span><span class="nav-label" data-page-node-id="ziJtwOzJ1xdCaYszYfR1ty">考试倒计时</span>
+          </a>
+          <a class="nav-item" data-route="daily-plan" data-page-node-id="K3ULfLrsSVyYaRxExi6vlw">
+            <span class="nav-icon" data-page-node-id="AMGgCtOwUTH2bTZIHfVyo7">📝</span><span class="nav-label" data-page-node-id="z58aTIXZqDjczKr4KTDASG">每日计划</span>
+          </a>
+        </div>
+
+        <div class="nav-group" data-page-node-id="JZeVKsLx7eHX1lqq1RoUwK">
+          <div class="nav-group-title" data-page-node-id="629spT5eiZKXPFE17Jh1PJ">📚 行测学习</div>
+          <a class="nav-item" data-route="politics" data-page-node-id="relksZTnTP4XGWl7uQz7IM">
+            <span class="nav-icon" data-page-node-id="jXAskfAuxT544cPqKsyODR">🏛️</span><span class="nav-label" data-page-node-id="qC9PABJB9zmGpLmIJVAaBe">政治理论</span>
+          </a>
+          <a class="nav-item" data-route="common-sense" data-page-node-id="J49JSfUZdirOFQ9p6T9trI">
+            <span class="nav-icon" data-page-node-id="DE1QpPpN0gtbgjzvBeNonx">🌐</span><span class="nav-label" data-page-node-id="NirrtgGUtewHxUzZuGPYgH">常识</span>
+          </a>
+          <a class="nav-item" data-route="language" data-page-node-id="HDzsPiXFgst2xwfGeCiKD7">
+            <span class="nav-icon" data-page-node-id="Nd2U14LbDhjA7REgMZ5ovD">💬</span><span class="nav-label" data-page-node-id="tFF7pysD3BpPT9lAz5vBqS">言语理解</span>
+          </a>
+          <a class="nav-item" data-route="logic" data-page-node-id="nkufig3AlcahnduYPZt5J4">
+            <span class="nav-icon" data-page-node-id="FJG6D5wjohEvqs9NTOaGt7">🧩</span><span class="nav-label" data-page-node-id="DOey9rTCV2NNs2o7go260J">逻辑判断</span>
+          </a>
+          <a class="nav-item" data-route="quantity" data-page-node-id="31XIRPAJAlXTTNzmRNYsaU">
+            <span class="nav-icon" data-page-node-id="N9wndhLTBezUmHtrhbalsO">🔢</span><span class="nav-label" data-page-node-id="NXM46Q38sQ5M1hSL7Gx6HT">数量关系</span>
+          </a>
+          <a class="nav-item" data-route="data-analysis" data-page-node-id="5XSVFLWG1IXXZ4xbTGnlXg">
+            <span class="nav-icon" data-page-node-id="S0mMaioWUkE48bA6R5o12o">📊</span><span class="nav-label" data-page-node-id="NCdf4MnNgIYTBw11vEssr8">资料分析</span>
+          </a>
+          <a class="nav-item" data-route="stats" data-page-node-id="Gv4WvDlhzyw2igrsUPtSqD">
+            <span class="nav-icon" data-page-node-id="K0ABWJi0tlez29YlC2tIlE">📈</span><span class="nav-label" data-page-node-id="iU3C9CLCwy7jnWvDFn1mz1">每日统计</span>
+          </a>
+        </div>
+
+        <div class="nav-group" data-page-node-id="Y3mZkbLsyeoHk3HBLGXgK5">
+          <div class="nav-group-title" data-page-node-id="hxI0gt4cWEPb2JrxfjpPno">✍️ 申论学习</div>
+          <a class="nav-item" data-route="shenlun-small" data-page-node-id="VNBWBJwLcfEonkNUrFUSil">
+            <span class="nav-icon" data-page-node-id="wmIy3Zp6Zh1xIVj2PNEWHj">📄</span><span class="nav-label" data-page-node-id="IuX6HFIH4jDHOhGZffoPtm">申论小题</span>
+          </a>
+          <a class="nav-item" data-route="shenlun-big" data-page-node-id="1LN8PAMUsHKDIJd6MUcI1o">
+            <span class="nav-icon" data-page-node-id="XK5XcdIzwTu8D7RF44LdpJ">📜</span><span class="nav-label" data-page-node-id="Hi2TICkHUlW1bW2UW69tIF">大作文</span>
+          </a>
+        </div>
+
+        <div class="nav-group" data-page-node-id="Rx3vSjE1P6bL3in5uxuwkD">
+          <div class="nav-group-title" data-page-node-id="ChUYMRNzkUxUr6LwDyjafe">📒 错题本</div>
+          <a class="nav-item" data-route="errors" data-page-node-id="wtrYU3q6TmquomOAahyFDw">
+            <span class="nav-icon" data-page-node-id="0pAaVWtFvF1rZBRjoVKex0">🗂️</span><span class="nav-label" data-page-node-id="G8KzPob8eesHNcsksp0KCl">错题汇总</span>
+          </a>
+        </div>
+      </nav>
+
+      <!-- 底部：设置 + 数据 -->
+      <div class="sidebar-foot" data-page-node-id="gRRjVTW2US33G1ToD1Gqe6">
+        <button class="foot-btn" id="settingsBtn" data-page-node-id="SoZ8lP3Nm7IUVx7rXDBGj6">⚙️ 设置</button>
+        <div class="settings-panel" id="settingsPanel" hidden data-page-node-id="ML4i19j3okqvf3It3QTxfJ">
+          <div class="set-row" data-page-node-id="a5nPEAeRIBeBDSdeYYbAj8">
+            <span data-page-node-id="EEJKZIcYgdn8n78ZP2NOgk">字体大小</span>
+          </div>
+          <div class="font-opts" data-page-node-id="HXkFTJI9aBbcToOAD7IDPm">
+            <button class="font-opt" data-font="s" data-page-node-id="zq1XEmd9ThRBLqVzIdEsJu">小</button>
+            <button class="font-opt active" data-font="m" data-page-node-id="rHU236AVpx1uOQSjATrER6">中</button>
+            <button class="font-opt" data-font="l" data-page-node-id="qY9BAZdAVcJHx5nhC0he6o">大</button>
+          </div>
+          <div class="set-row" style="margin-top:10px" data-page-node-id="6kF0O7secWJqBYwq9s368x">
+            <span data-page-node-id="jDBoHXYkZyxtgidvO2Y8BG">数据同步</span>
+            <button class="ghost-btn small" id="openSyncBtn" data-page-node-id="openSyncBtnNode">☁️ 配置云端同步</button>
+          </div>
+          <div class="set-row"><span class="sync-mini" id="syncMini" data-page-node-id="vk5d7tPz4DpaQMYFYzPCzh">本机保存</span></div>
+        </div>
+        <div class="foot-data" data-page-node-id="kwYJzG42slMn6TXIsEZJoR">
+          <button class="ghost-btn small" id="exportBtn" data-page-node-id="cZjvHh83fO6DBPpV0C2MXV">💾 导出</button>
+          <button class="ghost-btn small" id="importBtn" data-page-node-id="ZmKNnHH7x32RLOwYpydCyH">📥 导入</button>
+          <input type="file" id="importFile" accept=".json" hidden data-page-node-id="pCsUAnpNIKMri5FKxMrhuv">
+        </div>
+      </div>
+    </aside>
+
+    <!-- 折叠时的重新展开按钮 -->
+    <button class="reopen-btn" id="reopenBtn" hidden data-page-node-id="mNZwvpMKGL7TFmxx1SUvVx">☰</button>
+
+    <!-- 遮罩 -->
+    <div class="backdrop" id="backdrop" data-page-node-id="b21GGeDmlViGzhuKW4Mc02"></div>
+
+    <!-- 主内容区 -->
+    <main class="main" data-page-node-id="KBlbLJb4Th8Uv9nCKFH0a7">
+      <!-- 倒计时 -->
+      <section class="view" data-view="countdown" data-page-node-id="zTFEYTWamFgzVFy8hsr5ZB">
+        <div class="view-header" data-page-node-id="4QAIyg6CmdMmUD1ZsjneXK">
+          <h2 data-page-node-id="Ik0Qi2SC4xROHfQIRKEdeZ">⏰ 考试倒计时</h2>
+          <p class="muted" data-page-node-id="2Z14Y7oqTUsLb0axJF2PAO">每日鼓励 + 毛选金句 + 考试提醒</p>
+        </div>
+
+        <div class="card encourage-card" id="encourageCard" data-page-node-id="9nupVZJsuac8Nip7pw2kGD">
+          <span class="encourage-emoji" data-page-node-id="iQ7jjlkkjwsv94eyaKWPpj">🌞</span>
+          <div class="encourage-text" id="encourageText" data-page-node-id="rbUugYcUEFtkmX8C6DHLcv">今日份鼓励：你今天的努力，是明天上岸的底气！</div>
+        </div>
+
+        <div class="card mao-card" data-page-node-id="DxYmboqBaqd9gxfkIu8TC0">
+          <div class="card-head" data-page-node-id="spD9OTPKr91BBeibe6wCWw">
+            <span class="card-icon" data-page-node-id="COecV7RTGF4FKXgwlmNxZG">📖</span>
+            <span class="card-title" data-page-node-id="Z6hGKoNheoXqVJb9UFxrw1">今日毛选金句</span>
+            <span class="card-tag" id="maoDateTag" data-page-node-id="qkXoTtFITogLUs6u0B1bi2"></span>
+          </div>
+          <div class="card-body mao-body" data-page-node-id="t3WjSLJyQznMkebCurkjjj">
+            <div class="mao-quote" id="maoQuote" data-page-node-id="Hhi8Lz6xQQed6kHqFDKBXb">"…"</div>
+            <div class="mao-source" id="maoSource" data-page-node-id="qQXWEeXxRNtorxA6m9MYPB">——《毛泽东选集》</div>
+          </div>
+          <div class="card-foot" data-page-node-id="S6moic47ZUbFu1sRQapsPb">
+            <button class="ghost-btn" id="maoPrev" data-page-node-id="X3msFbjruPB6Swtdg2C3z5">← 上一句</button>
+            <button class="ghost-btn" id="maoNext" data-page-node-id="k2lqK9RDviDjk5WLY4MnaJ">下一句 →</button>
+            <span class="mao-counter" id="maoCounter" data-page-node-id="bHipGBwdnEr5giYQC2HRhP">— / —</span>
+          </div>
+        </div>
+
+        <div class="card" data-page-node-id="z7AWH7R0qJVlZnoR7u6biJ">
+          <div class="card-head" data-page-node-id="oGs9rW1chdogWhujqGrBin">
+            <span class="card-icon" data-page-node-id="Dqpa7SDNubSDHVhFCThFKC">🎯</span>
+            <span class="card-title" data-page-node-id="SCvkmBHtC74ioXyLHlXHYD">考试倒计时</span>
+            <button class="mini-btn" id="addExamBtn" data-page-node-id="rc6PCW00PPT7q0qB8gTUXe">+ 添加考试</button>
+          </div>
+          <div class="card-body" data-page-node-id="7cPgXR270b6xwoUe4OHmr7">
+            <div class="exam-list" id="examList" data-page-node-id="yVgA0dtzjTx4zuGh6fMFzF"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 每日计划 -->
+      <section class="view" data-view="daily-plan" data-page-node-id="CV64DDEDG9vAFyHzybTxGL">
+        <div class="view-header" data-page-node-id="CYJs9YzsH4ZFrzyHiuBnAf">
+          <h2 data-page-node-id="G7nFHnPwRS2D3HKgEFDPdE">📝 每日计划</h2>
+          <p class="muted" data-page-node-id="DMK2BKOWfq5l53lVsJxGE4">打卡目标分类，每日只可完成一次</p>
+        </div>
+        <div class="card" data-page-node-id="lfA07FBWeGbz7ltGLVH2HW">
+          <div class="card-head" data-page-node-id="8P8pDuvLUYpw8sUDaU1Bfw">
+            <span class="card-icon" data-page-node-id="Tw5J9yecf8U5ZqkwoxMueS">🎯</span>
+            <span class="card-title" data-page-node-id="TDMXPVRrEuMt8dskDFqoAN">添加打卡目标</span>
+          </div>
+          <div class="card-body" data-page-node-id="dzjYE8QQwADDtdVkFlHWef">
+            <div class="form-row" data-page-node-id="xtUkblA2iBWoNtDy8pnKvB">
+              <input type="text" id="planInput" placeholder="如：背诵5个成语辨析" class="text-input" data-page-node-id="etLMJHJIFZSaE03p6pqjC3">
+              <select id="planCategory" class="select-input" data-page-node-id="BvaEIbKiCJkFj3YDe1nPrA">
+                <option value="政治理论" data-page-node-id="3xdo6ufRZqTdM0bxE5F9Sq">政治理论</option>
+                <option value="常识" data-page-node-id="cJS4hTn4yHjPMNUkTFmBJF">常识</option>
+                <option value="言语理解" data-page-node-id="qDKuwRqDmdPhlV4F1Ec6Z7">言语理解</option>
+                <option value="逻辑判断" data-page-node-id="CA7FZ32F9vHPvXx8EmXwHf">逻辑判断</option>
+                <option value="数量关系" data-page-node-id="StNQcwnZqVQXjBlOWbZkbg">数量关系</option>
+                <option value="资料分析" data-page-node-id="ibNrmgaWEBraED94AUQJVK">资料分析</option>
+                <option value="其他" data-page-node-id="zs32BRRcOgPTZ0TioD5tQb">其他</option>
+              </select>
+              <button class="primary-btn" id="addPlanBtn" data-page-node-id="aXlu41A2wO7xfF6AC0RySi">＋ 添加</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" data-page-node-id="VousVTqnbcdBqP866KmsoW">
+          <div class="card-head" data-page-node-id="orwg24mzu1B7md8zOrNW2r">
+            <span class="card-icon" data-page-node-id="MFQs4wtMqqitCti5O6s19k">📊</span>
+            <span class="card-title" data-page-node-id="94mcWsVBVgztkz8GKqHd6l">今日进度总览</span>
+            <span class="muted" id="todayDateLabel" data-page-node-id="8k2XSDsMu1APOGgeRUHwFk"></span>
+          </div>
+          <div class="card-body" data-page-node-id="r469jIYDoWM42B3cyP1CeD">
+            <div class="progress-grid" id="progressGrid" data-page-node-id="DI2NtZZUr7DNO3Tm3mpbFV"></div>
+          </div>
+        </div>
+
+        <div class="card" data-page-node-id="Rv3jhAMNh2kroq6YofAu7z">
+          <div class="card-head" data-page-node-id="PR4uE1HVjSXZIy9lvvsafx">
+            <span class="card-icon" data-page-node-id="0UKcu1DtH9bUqgBvkVn5ZN">✅</span>
+            <span class="card-title" data-page-node-id="vUUGoVMAoOV2Z76FFG9DEz">今日打卡</span>
+          </div>
+          <div class="card-body" data-page-node-id="YK0yJWGykWfxSskEAYc0zg">
+            <div class="plan-list" id="planList" data-page-node-id="pHDPwcWjbbjezpyIkgQUQY"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 政治理论 -->
+      <section class="view" data-view="politics" data-page-node-id="7w3NrhqhZpzVXke3UDjkJ7">
+        <div class="view-header" data-page-node-id="GEJNRLKeLN44bmthYCYoLd">
+          <h2 data-page-node-id="cPWyCABLs9e5numkyCWPgH">🏛️ 政治理论</h2>
+          <p class="muted" data-page-node-id="mRjLPw63zPuKelKHZ0iQvJ">网课进度 · 课程笔记 · 时政热点</p>
+        </div>
+        <div class="module-header" id="mhead-politics" data-page-node-id="cV89LQHvi57LtypUloiFAP"></div>
+        <div class="card study-plan-card" data-page-node-id="spPoliticsCard">
+          <div class="card-head" data-page-node-id="spPoliticsHead">
+            <span class="card-icon" data-page-node-id="spPoliticsIcon">📺</span>
+            <span class="card-title" data-page-node-id="spPoliticsTitle">追剧式复习 · 政治理论</span>
+            <span class="muted" id="spPoliticsSummary" data-page-node-id="spPoliticsSummary"></span>
+          </div>
+          <div class="card-body" data-page-node-id="spPoliticsBody">
+            <div class="study-plan" id="politicsStudyPlan" data-page-node-id="spPoliticsList"></div>
+          </div>
+        </div>
+        <div class="course-progress" id="politicsCourse" data-course="politics" data-page-node-id="CFahFzsE4fwraLVvpVCc7V"></div>
+        <div class="card" data-page-node-id="k7s6FJm4zfwn8R6AWGjcfH">
+          <div class="card-head" data-page-node-id="qeelgrSq4N3wRQgi4PODgP">
+            <span class="card-icon" data-page-node-id="wxRNH12oXxQ8HFfeojVBXn">🗒️</span>
+            <span class="card-title" data-page-node-id="pew3a3kGoJZAkn6cQwNofr">课程笔记</span>
+            <span class="muted" data-page-node-id="QWaA1FDtyBP9rot26SRfFR">每节课可记文字 + 图片</span>
+          </div>
+          <div class="card-body" data-page-node-id="P0jDuJ9iTtWPdEZ5WE3eAc">
+            <div class="note-hint" data-page-node-id="uP73ekfgJ6THWvJnuWjY5S">在上方课程目录中点击任意一节右侧的 📝 即可添加笔记</div>
+          </div>
+        </div>
+        <div class="card" data-page-node-id="fKfEaQjBk6oXmpFE1iHsjF">
+          <div class="card-head" data-page-node-id="BPOK3RB9npW8tvS4es18Ij">
+            <span class="card-icon" data-page-node-id="OsxIv3rPGttfmkrygGxsad">📰</span>
+            <span class="card-title" data-page-node-id="i7EEEMTijV1691lks452MY">今日时政热点积累</span>
+            <span class="muted" id="politicsDate" data-page-node-id="2BRqS8ZGPh4br2FPrBOEDm"></span>
+          </div>
+          <div class="card-body" data-page-node-id="VkjXYVOqVR6hAv0cLozpsj">
+            <ol class="news-list" id="politicsToday" data-page-node-id="4rdn4PFC8Iv2gCZIpw9Jwh"></ol>
+          </div>
+        </div>
+        <div class="card" data-page-node-id="qW97njwb1BURYULxJOOKSQ">
+          <div class="card-head" data-page-node-id="PbjMXCHgODKCl8lEawLYqV">
+            <span class="card-icon" data-page-node-id="5iw1Q0XjZc2w2KvLarEQ0J">📚</span>
+            <span class="card-title" data-page-node-id="njiHoVh3U4WPq23CxVRqCV">往期时政热点积累</span>
+            <button class="mini-btn" id="politicsRefresh" data-page-node-id="ZCmf4xPoxtECHQul3YclTQ">🔄 换一批</button>
+          </div>
+          <div class="card-body" data-page-node-id="PP6LFdwHd4xpv6jhCte69C">
+            <ol class="news-list" id="politicsPast" data-page-node-id="lxw277GqAJM2tLdRfi7aFf"></ol>
+          </div>
+        </div>
+
+        <div class="card" data-page-node-id="polImportCard">
+          <div class="card-head" data-page-node-id="polImportHead">
+            <span class="card-icon" data-page-node-id="polImportIcon">📥</span>
+            <span class="card-title" data-page-node-id="polImportTitle">导入外部时政 JSON</span>
+          </div>
+          <div class="card-body" data-page-node-id="polImportBody">
+            <div class="form-row" data-page-node-id="polImportRow">
+              <label class="ghost-btn" for="importPolitics" data-page-node-id="polImportLabel">选择 JSON 文件</label>
+              <input type="file" id="importPolitics" accept=".json" hidden data-page-node-id="polImportInput">
+              <span class="muted" id="politicsImportTip" data-page-node-id="polImportTip">格式：{ "today": [...5条], "past": [...5条] }</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 常识 -->
+      <section class="view" data-view="common-sense" data-page-node-id="84sjU4gDMb10ZJFpHT7dX8">
+        <div class="view-header" data-page-node-id="isBrgDxr6WSN5Pg0YytMMc">
+          <h2 data-page-node-id="9rLDehTpBcaHJGm1HNxZCc">🌐 常识积累</h2>
+          <p class="muted" data-page-node-id="KvwJsWb7b7SuxsDoFMJMA6">网课进度 · 分门别类常识</p>
+        </div>
+        <div class="module-header" id="mhead-common-sense" data-page-node-id="sidHMVLOegMElWU2TvzLJY"></div>
+        <div class="card study-plan-card" data-page-node-id="spCommonCard">
+          <div class="card-head" data-page-node-id="spCommonHead">
+            <span class="card-icon" data-page-node-id="spCommonIcon">📺</span>
+            <span class="card-title" data-page-node-id="spCommonTitle">追剧式复习 · 常识判断</span>
+            <span class="muted" id="spCommonSenseSummary" data-page-node-id="spCommonSummary"></span>
+          </div>
+          <div class="card-body" data-page-node-id="spCommonBody">
+            <div class="study-plan" id="commonSenseStudyPlan" data-page-node-id="spCommonList"></div>
+          </div>
+        </div>
+        <div class="course-progress" id="commonSenseCourse" data-course="commonSense" data-page-node-id="aU5hZ7idwIf1bYN6FsqXtC"></div>
+        <div class="card" data-page-node-id="CokwvXsJgHoyqwr13NPEXo">
+          <div class="card-head" data-page-node-id="SnHr4UyG5Ib8DkFkk3v6Yj">
+            <span class="card-icon" data-page-node-id="mGLv5F7HUHG6srAWoqKaJ3">🗒️</span>
+            <span class="card-title" data-page-node-id="TXGdH7KSyxvZitbNlluSet">课程笔记</span>
+          </div>
+          <div class="card-body" data-page-node-id="xdK9u2YQTiIA6fSMZGi2ns">
+            <div class="note-hint" data-page-node-id="DqT7AaB6hGN7u80FrwbCXm">在上方课程目录中点击任意一节右侧的 📝 即可添加笔记</div>
+          </div>
+        </div>
+        <div class="card" data-page-node-id="ZPk7ajdrrrHJvbcRfD5Bkq">
+          <div class="card-head" data-page-node-id="c1vzTAW88QjvWveJKZ9Oka">
+            <span class="card-icon" data-page-node-id="HOuZ8tZYNVG2uAk0pmfwcY">📚</span>
+            <span class="card-title" data-page-node-id="4P54RsmIaqlNvBOWDzEaot">今日常识积累</span>
+            <span class="muted" id="csDate" data-page-node-id="iQT7xBT7NOAz9TIykjKAVS"></span>
+          </div>
+          <div class="card-body" data-page-node-id="1YCj6tuAGkRlneMFlGdOi0">
+            <div class="cs-list" id="csList" data-page-node-id="eml7cjmkc22GpJS2f5wpBz"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 言语理解 -->
+      <section class="view" data-view="language" data-page-node-id="BXTrTrw2KL2nIT1gnSlxDf">
+        <div class="view-header" data-page-node-id="01pOv2WUHg7MQYno91GGay">
+          <h2 data-page-node-id="BTDrSqYc8MMBRmAIhXQGPV">💬 言语理解</h2>
+          <p class="muted" data-page-node-id="2GuUgTNwEbCMv6PyzRvdh9">网课进度 · 课程笔记 · 成语辨析</p>
+        </div>
+        <div class="module-header" id="mhead-language" data-page-node-id="PLbNZNnbNLphzGhd1aE5oJ"></div>
+        <div class="course-progress" id="languageCourse" data-course="language" data-page-node-id="9nuki36wIsdqNkNKIzpT84"></div>
+        <div class="card" data-page-node-id="dyEUtvA66xdFt4iFAWWf31">
+          <div class="card-head" data-page-node-id="zlzWbmSswtgl1ZYoz0PypP">
+            <span class="card-icon" data-page-node-id="pFqaZJxS5FKqqjYPEQQb8G">🗒️</span>
+            <span class="card-title" data-page-node-id="AVUFZiZpDGamuPQUCDndlT">课程笔记 / 学习反馈</span>
+          </div>
+          <div class="card-body" data-page-node-id="Cw1jV7ZgTOXLMvhMyaUsnp">
+            <div class="note-hint" data-page-node-id="9OdTu0I3KPthtH9ZES8m1P">在上方课程目录中点击任意一节右侧的 📝 即可添加笔记</div>
+          </div>
+        </div>
+        <div class="card" data-page-node-id="OHG4aMlHXmbF8SZHYLpFYT">
+          <div class="card-head" data-page-node-id="CHxpiUSJGUWsUFPuK4fita">
+            <span class="card-icon" data-page-node-id="jQgCej9znUbnrOiZ8M79qj">🔤</span>
+            <span class="card-title" data-page-node-id="EINguDjAc6yqLhT8aGumaM">成语辨析</span>
+          </div>
+          <div class="card-body" data-page-node-id="zMkHp2ajqP26JzfabOpvCm">
+            <div class="idiom-list" id="idiomList" data-page-node-id="ioNxYPKF9EJ3PVned4RDzK"></div>
+          </div>
+        </div>
+        <div class="card" data-page-node-id="ksq60XLssaHVAmI9EtBaFG">
+          <div class="card-head" data-page-node-id="leTuzjwUrwhbGeEl3WgNEk">
+            <span class="card-icon" data-page-node-id="JDaceDxeubow04ZfBPIhbA">✏️</span>
+            <span class="card-title" data-page-node-id="m0FDGN0GEmdjPzEfrwLhuL">检验试题（每日 5 题）</span>
+          </div>
+          <div class="card-body" data-page-node-id="iumFIv8MNqcDozd9y7bTz7">
+            <div class="quiz-list" id="langQuiz" data-page-node-id="p6djJIQ9ODktN14XaQ93SS"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 逻辑判断 -->
+      <section class="view" data-view="logic" data-page-node-id="CuNHZ7hmIsxljdhTmJKJVX">
+        <div class="view-header" data-page-node-id="Co6BuNK2AM7HPm0tOhF3rl">
+          <h2 data-page-node-id="63AYbMDvI2cIwOr9xcLenk">🧩 逻辑判断</h2>
+          <p class="muted" data-page-node-id="uyDPlLQxzWyCoKAkaoh4jj">每日滚动 3 题</p>
+        </div>
+        <div class="module-header" id="mhead-logic" data-page-node-id="CxAmDi6A6PD2H8x3k4lMSr"></div>
+        <div class="card" data-page-node-id="nh9kadISkIf3kcZxWUjBuQ">
+          <div class="card-head" data-page-node-id="cNIDZAPnXuWCeGbJAYICDT">
+            <span class="card-icon" data-page-node-id="5O75k9GqubfRjBcyHo4IJE">🎲</span>
+            <span class="card-title" data-page-node-id="Y3WvvzHAmIS3t3E5V9Toau">今日逻辑题</span>
+          </div>
+          <div class="card-body" data-page-node-id="Puw09BGPde8RGamyGfJwWc">
+            <div class="quiz-list" id="logicQuiz" data-page-node-id="lScksfb8xrI2wXnG8hE6ts"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 数量关系 -->
+      <section class="view" data-view="quantity" data-page-node-id="rMARAlacyMdCCSf6ZEECMY">
+        <div class="view-header" data-page-node-id="RXQeoU5jkk2Wv9s1yj7FRA">
+          <h2 data-page-node-id="WFrZQ0pPo2CttF3Hi49vTv">🔢 数量关系</h2>
+          <p class="muted" data-page-node-id="Lb0meZ6yGhNSx4QQNHNHvS">每日滚动一个题型的公式与例题</p>
+        </div>
+        <div class="module-header" id="mhead-quantity" data-page-node-id="i7h8vvc0WARCxQc5I9pxvy"></div>
+        <div class="card" data-page-node-id="5Ex9rRtoyABDal3CXrk73J">
+          <div class="card-head" data-page-node-id="hPCnCei68nzeE7X7mIQ4eT">
+            <span class="card-icon" data-page-node-id="4mYkxuW3aJwAB3ZR4caGtJ">📐</span>
+            <span class="card-title" data-page-node-id="XrvB9wHL7ZRyQw4TKwlMZz">今日题型</span>
+            <button class="mini-btn" id="qtyNextBtn" data-page-node-id="HcrBEKTOAmjcDLs3LOGlQY">下一题型 →</button>
+          </div>
+          <div class="card-body" data-page-node-id="bz8UxJ0KuTdxqPC0CoSlpk">
+            <div class="qty-type" id="qtyType" data-page-node-id="SkNSKIHTBDUFPlba54KBAt"></div>
+            <div class="qty-formula" id="qtyFormula" data-page-node-id="bU7QAkniemgirW8dEquILN"></div>
+            <div class="qty-example" id="qtyExample" data-page-node-id="w1SUDHyo7qUejsBlyxrGxC"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 资料分析 -->
+      <section class="view" data-view="data-analysis" data-page-node-id="9fLjIip5XrYRlDgqrOK7Zd">
+        <div class="view-header" data-page-node-id="uhwOJbnEEQ64UFJn1MdoRi">
+          <h2 data-page-node-id="f32qpM5WSG8s8nmecuN7VF">📊 资料分析</h2>
+          <p class="muted" data-page-node-id="3JVjsDFp03FuWGafaAKppd">网课进度 · 公式板块 · 百分化练习</p>
+        </div>
+        <div class="module-header" id="mhead-data-analysis" data-page-node-id="6qvPnpsK5aFeFFkJiYlzTl"></div>
+        <div class="course-progress" id="dataAnalysisCourse" data-course="dataAnalysis" data-page-node-id="VXKeP0PyAOHVfiAUT1HI3v"></div>
+        <div class="card" data-page-node-id="UQxEi6lrcTsCafJIswcOZX">
+          <div class="card-head" data-page-node-id="YI5rGpFr38lXWptEbFPraN">
+            <span class="card-icon" data-page-node-id="W1zEIM4N5x1GKQJT7JYKUI">🗒️</span>
+            <span class="card-title" data-page-node-id="sds1na56qrNVedB2QktahW">课程笔记</span>
+          </div>
+          <div class="card-body" data-page-node-id="aW0PaclqEBLhzVUSThVHy7">
+            <div class="note-hint" data-page-node-id="smSzoMIU4NVX1G8qrRR9bn">在上方课程目录中点击任意一节右侧的 📝 即可添加笔记</div>
+          </div>
+        </div>
+        <div class="card" data-page-node-id="5m6zb0fL9bAhNLjBfTLLS4">
+          <div class="card-head" data-page-node-id="MLAxVrl6S1zybndFVZ0K6r">
+            <span class="card-icon" data-page-node-id="ABnsBXUAAsK2nTTJVvAcnZ">📚</span>
+            <span class="card-title" data-page-node-id="PmhAF081MxAcpJ3gIs5X5Q">核心公式（每日滚动）</span>
+          </div>
+          <div class="card-body" data-page-node-id="5dO4kQFPeEtMNBuoIp4Xr8">
+            <div class="formula-grid" id="formulaGrid" data-page-node-id="1UcI89jfhUMxExgqWR7Tyz"></div>
+          </div>
+        </div>
+        <div class="card" data-page-node-id="udO3B16bc9RzuiYEPyvxoY">
+          <div class="card-head" data-page-node-id="IOI20cKe3C2dSBkfdt15VQ">
+            <span class="card-icon" data-page-node-id="1MFOG3eHOjR8Gcrj1lMRp9">✏️</span>
+            <span class="card-title" data-page-node-id="BVtC6PW6fZWr5jsa9ahbkA">公式小检验</span>
+          </div>
+          <div class="card-body" data-page-node-id="Wf90nKhY9Rel7I56v7Hi0t">
+            <div class="quiz-list" id="formulaQuiz" data-page-node-id="vuNHoAP7BUfY3cOHLIwmsn"></div>
+          </div>
+        </div>
+        <div class="card" data-page-node-id="xOpvhaEvMEhF1wUEyxhEam">
+          <div class="card-head" data-page-node-id="PXrpDorhiZ08jLIHLyAHgH">
+            <span class="card-icon" data-page-node-id="fC5i32BlD0PfZQRfoMMdfG">🎯</span>
+            <span class="card-title" data-page-node-id="tuTkAmMsMyzD4H2xMGEREC">百分化乱序版练习（每日 3 题）</span>
+          </div>
+          <div class="card-body" data-page-node-id="BtXrNFFDxmHU6poLMKXxIH">
+            <div class="quiz-list" id="daPercentQuiz" data-page-node-id="u3i1brahhqYkwhhuanaQRB"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 每日统计 -->
+      <section class="view" data-view="stats" data-page-node-id="bGaq47ceALIDijCD2YGkQE">
+        <div class="view-header" data-page-node-id="IYRK5u22D6CA86TIxPCon6">
+          <h2 data-page-node-id="3su5auj05EfKKepwpPovt8">📈 每日统计</h2>
+          <p class="muted" data-page-node-id="A6pw2y2wGWYg1XyXz8CGgQ">各模块做题数 / 时长 / 正确率</p>
+        </div>
+        <div class="stats-grid" id="statsGrid" data-page-node-id="wGikuiaeMphzgXbEVqkAtX"></div>
+
+        <div class="card" data-page-node-id="7QRv6Q467GlbDhXr4TSsEd">
+          <div class="card-head" data-page-node-id="6NGMl28prGg4F4LI5z1q5I">
+            <span class="card-icon" data-page-node-id="Xik8lPIhTXA8msquGCXg08">📊</span>
+            <span class="card-title" data-page-node-id="52Wew8MBBWAoHFwTTECvLH">最近 30 天 做题趋势</span>
+            <div class="muted" data-page-node-id="nbLqWuFQcZP3hyP9xOGPAL">
+              <label data-page-node-id="PBwhxBDHH3KLtDNuMpQ8hQ"><input type="radio" name="trendMetric" value="count" checked data-page-node-id="VubYcfNRvoIl6LhlAdxhJj"> 题数</label>
+              <label style="margin-left:8px" data-page-node-id="w9K0GtnD3Z3W4DwbE34Fei"><input type="radio" name="trendMetric" value="duration" data-page-node-id="AW8s4hfPHCf3Aggch0kwn7"> 时长</label>
+            </div>
+          </div>
+          <div class="card-body" data-page-node-id="IUkQtDqTRR04Bq9D2nFFxs">
+            <div class="trend-chart" id="trendChart" data-page-node-id="gY3hOgW3BsjzMFRlzRtAyz"></div>
+          </div>
+        </div>
+        <div class="card" data-page-node-id="4oPiC313h5QdWSZTIFdUbT">
+          <div class="card-head" data-page-node-id="lON07uY7TWPpSOGcnowCdY">
+            <span class="card-icon" data-page-node-id="GDmp8yBnNcAGJwklh5ow7i">📝</span>
+            <span class="card-title" data-page-node-id="eoMx9HuDih2CvFZFXbZykl">手动记录</span>
+          </div>
+          <div class="card-body" data-page-node-id="nJV7qUkeuUsZ8yNGNJLqBa">
+            <div class="form-row" data-page-node-id="DZQ3pOW1z0z3g7ij6Ju3AM">
+              <select id="statModule" class="select-input" data-page-node-id="RZWLRMucccEATTR4lHAvTl">
+                <option value="政治理论" data-page-node-id="QO9De7dEVi1s4xlwVGXjBf">政治理论</option>
+                <option value="常识" data-page-node-id="yKN1KQHDFFhxDKv4VsKDVt">常识</option>
+                <option value="言语理解" data-page-node-id="NSLDreghbFPJSC7amwmDlP">言语理解</option>
+                <option value="逻辑判断" data-page-node-id="IxG5i1QIzwzaN4CpPCvzXD">逻辑判断</option>
+                <option value="数量关系" data-page-node-id="uqYBJxpkolAbnsYxo3MIRA">数量关系</option>
+                <option value="资料分析" data-page-node-id="M7brLMXc0wOJiP5B5VHVU2">资料分析</option>
+              </select>
+              <input type="number" id="statCount" placeholder="做题数" min="0" class="text-input" data-page-node-id="PKesGoC0rRYFz1rsVtcdyc">
+              <input type="number" id="statDuration" placeholder="时长(分钟)" min="0" class="text-input" data-page-node-id="Hp89EDkQnDJA5EAyjllXou">
+              <input type="number" id="statCorrect" placeholder="正确数" min="0" class="text-input" data-page-node-id="A9ka8C3RXX85agiuCpWhGs">
+              <button class="primary-btn" id="addStatBtn" data-page-node-id="qS1SWvwLoOwavArUdOX2At">＋ 记录</button>
+            </div>
+          </div>
+        </div>
+        <div class="card" data-page-node-id="4mUDbub7hak0z7XTdK4sqS">
+          <div class="card-head" data-page-node-id="LrPBOOqkhCjBHplUsv5r0K">
+            <span class="card-icon" data-page-node-id="08nnQjIgXtBPyYxBP3noFU">📅</span>
+            <span class="card-title" data-page-node-id="gzKTxI9yxwwBW4Rfgu4c5o">历史记录</span>
+          </div>
+          <div class="card-body" data-page-node-id="1airDpvxKZV2nOFa6OSH15">
+            <div class="stat-history" id="statHistory" data-page-node-id="Fl3KJPQafGzdwgInun3DGu"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 申论小题 -->
+      <section class="view" data-view="shenlun-small" data-page-node-id="ivxmqLxCMhAL9FvizzXA7P">
+        <div class="view-header" data-page-node-id="NOqVpoKbXbPptKNAjF7ILs">
+          <h2 data-page-node-id="1nzee0fziJFKlmrl5hfUvC">📄 申论小题</h2>
+          <p class="muted" data-page-node-id="EQSFbsixDGUvMdZjNdaxNe">每日滚动真题 + 解析（材料可折叠）</p>
+        </div>
+        <div class="module-header" id="mhead-shenlun-small" data-page-node-id="HRFfXOvd2kkkJxB1jaL3Gs"></div>
+        <div class="card" data-page-node-id="G1ttN1AE2RTRJvX5n0hygX">
+          <div class="card-head" data-page-node-id="hsz5Pqcb3ePy9pDZbthTbV">
+            <span class="card-icon" data-page-node-id="7HASPFSYm8Kr4za0HutLnK">📌</span>
+            <span class="card-title" data-page-node-id="nN7VtF8VfwL2TMxM7n7O0h">今日小题</span>
+          </div>
+          <div class="card-body" data-page-node-id="UNHcY8wfyZ4lnCWEGQuf2g">
+            <div class="sl-content" id="slSmallContent" data-page-node-id="FbCa4LuKcZMcZUblnvJq2F"></div>
+          </div>
+        </div>
+
+        <div class="card" data-page-node-id="slNormCard">
+          <div class="card-head" data-page-node-id="slNormHead">
+            <span class="card-icon" data-page-node-id="slNormIcon">📝</span>
+            <span class="card-title" data-page-node-id="slNormTitle">申论规范词 · 每日积累</span>
+            <span class="muted" data-page-node-id="slNormTip">每日 3 个</span>
+          </div>
+          <div class="card-body" data-page-node-id="slNormBody">
+            <div class="norm-list" id="normWordsList" data-page-node-id="slNormList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 大作文 -->
+      <section class="view" data-view="shenlun-big" data-page-node-id="KLKL5gmNAAvqyYkFnv3rG0">
+        <div class="view-header" data-page-node-id="1D4xJVKCxDsW08LmhBAPoh">
+          <h2 data-page-node-id="ZoStzG24I8qkiZE5tFn9l5">📜 大作文</h2>
+          <p class="muted" data-page-node-id="pjo7JRLMzmrU6kRDxrLFmp">主题素材 + 官方金句 + 案例</p>
+        </div>
+        <div class="module-header" id="mhead-shenlun-big" data-page-node-id="ov6cMZxSJQBccUfOD8ksc2"></div>
+        <div class="card" data-page-node-id="LPYVHmGa15HzjbSEDaPDbv">
+          <div class="card-head" data-page-node-id="YG3vEab2f8c3ZwuN4RN30J">
+            <span class="card-icon" data-page-node-id="LkHxuUelaaKjsXiIn7wKkc">🎯</span>
+            <span class="card-title" data-page-node-id="CKwZI3H6f6D6eUk3WgDwoz">今日主题</span>
+          </div>
+          <div class="card-body" data-page-node-id="oc9DFrGeIUjpb0bgNVimsQ">
+            <div class="sl-content" id="slBigTheme" data-page-node-id="E4YMIFGS9GcB6UWw21AqO3"></div>
+          </div>
+        </div>
+        <div class="card" data-page-node-id="SoSHP7VEIOOyaUZ4wuN0Yk">
+          <div class="card-head" data-page-node-id="CQxPbB1TQdLAMdI0XLOngr">
+            <span class="card-icon" data-page-node-id="jMZNAeolADSDLut9tZPrje">📚</span>
+            <span class="card-title" data-page-node-id="fzZ58clkjBiCTB9pxCtumH">素材与金句</span>
+          </div>
+          <div class="card-body" data-page-node-id="9G21U7NjI3QUWN3zWtm716">
+            <div class="sl-content" id="slBigMaterial" data-page-node-id="Qb8PiKJ5A9yKkV9SF3IJKu"></div>
+          </div>
+        </div>
+
+        <div class="card" data-page-node-id="slEssayCard">
+          <div class="card-head" data-page-node-id="slEssayHead">
+            <span class="card-icon" data-page-node-id="slEssayIcon">📖</span>
+            <span class="card-title" data-page-node-id="slEssayTitle">申论范文 · 每周精读</span>
+            <span class="muted" data-page-node-id="slEssayTip">每周一篇</span>
+          </div>
+          <div class="card-body" data-page-node-id="slEssayBody">
+            <div class="model-essay" id="modelEssay" data-page-node-id="slEssayContent"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 错题本 -->
+      <section class="view" data-view="errors" data-page-node-id="0nErNFZcqoYA9sA8CUYRHb">
+        <div class="view-header" data-page-node-id="oBYnhIZUuoyiVdYEPjnz1T">
+          <h2 data-page-node-id="JnhOOfWQqVW3SngJvXlg2X">🗂️ 错题本</h2>
+          <p class="muted" data-page-node-id="QCzH8FM69pxGwxebuWAlAg">图片 / 语音 / 备注 · 每周汇总 · 导出</p>
+        </div>
+        <div class="card" data-page-node-id="slB3woavZupKDx301wtHgA">
+          <div class="card-head" data-page-node-id="7QMKyvu6OdXgYx4HvxAusJ">
+            <span class="card-icon" data-page-node-id="KQYpBLAKTJrxxEwcTKx5XX">➕</span>
+            <span class="card-title" data-page-node-id="cOStYpl8lYCU1BU8cOi0sH">添加错题</span>
+            <button class="mini-btn" id="exportErrBtn" data-page-node-id="3q0QK0o6T4pmt184ucs0wB">📤 导出</button>
+          </div>
+          <div class="card-body" data-page-node-id="CzJtrA2zIw6y1WPZrfEqrF">
+            <div class="form-row" data-page-node-id="MdAivErnDQahtUgPT423gI">
+              <select id="errModule" class="select-input" data-page-node-id="b1RjEL5FMkZxDMh7FH1dUK">
+                <option value="政治理论" data-page-node-id="FBDNgdJxdoYuoP2J3ZdSap">政治理论</option>
+                <option value="常识" data-page-node-id="O9eOyKPc28WLJBTI4HKbV1">常识</option>
+                <option value="言语理解" data-page-node-id="wO8G7TCmfkfl2isLafFY6X">言语理解</option>
+                <option value="逻辑判断" data-page-node-id="ZSg2HUsiBWe2bsvhSjaA7E">逻辑判断</option>
+                <option value="数量关系" data-page-node-id="bUEI1GXlGTBL22eaE0MCh8">数量关系</option>
+                <option value="资料分析" data-page-node-id="BAYbBEle1kCB6cW1Dfwh4G">资料分析</option>
+                <option value="申论" data-page-node-id="euxEkhfnZDm3qZNfMhIpDE">申论</option>
+              </select>
+              <input type="text" id="errTitle" placeholder="错题简述（如：增长率公式用错）" class="text-input" data-page-node-id="v0TgoD7XeP6z6b0S1u2seR">
+            </div>
+            <div class="form-row" data-page-node-id="9FWa2mJJ4XsQbnWYaRJHQh">
+              <textarea id="errNote" placeholder="个人备注 / 错误原因 / 正确思路..." class="text-input" rows="3"></textarea>
+            </div>
+            <div class="form-row btn-row" data-page-node-id="wPGbboSLhLB2edgo6AkgPD">
+              <label class="ghost-btn" for="errImage" data-page-node-id="5SQKkrDNNu758F04OKpwv1">📷 上传图片</label>
+              <input type="file" id="errImage" accept="image/*" hidden data-page-node-id="am60tAbePz0b3HCJIMk037">
+              <button class="ghost-btn" id="errOcrBtn" data-page-node-id="errOcrBtn" disabled>🔍 识别图片文字</button>
+              <button class="ghost-btn" id="errVoiceBtn" data-page-node-id="5DorCD1O4tBjGrmInO4gCW">🎙️ 语音转文字</button>
+              <button class="primary-btn" id="addErrBtn" data-page-node-id="7I3YbTrj8isKrMXreMnOA6">＋ 保存</button>
+              <span class="muted" id="errImageLabel" data-page-node-id="TrUSQIGaqfnBdAQ7vBAWbs"></span>
+              <span class="muted" id="errOcrStatus" data-page-node-id="errOcrStatus"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" data-page-node-id="8dzADQ5NJFYifR2DhO0kyh">
+          <div class="card-head" data-page-node-id="JYpQMMGEFdqvJaRT9WtaxP">
+            <span class="card-icon" data-page-node-id="XTwgPqriidpjYnH4kq6Vjz">📅</span>
+            <span class="card-title" data-page-node-id="Pch1ngCcKdAdt7lCBEolVm">本周汇总</span>
+          </div>
+          <div class="card-body" data-page-node-id="ndSREa2a5ruoc85bRTtGQs">
+            <div class="err-week-summary" id="errWeekSummary" data-page-node-id="CZoI2ycTC5Sfcx1b3qGddJ"></div>
+          </div>
+        </div>
+
+        <div class="card" data-page-node-id="HTHTgwOERDOUjQXFxaGTVI">
+          <div class="card-head" data-page-node-id="9lHEplDJiHqcE0ioFEU36x">
+            <span class="card-icon" data-page-node-id="EtJozaKhTUEd9s46MQFyZG">📚</span>
+            <span class="card-title" data-page-node-id="KdIX12SeK4TNQ32po9Q5z0">错题列表</span>
+            <select id="errFilter" class="select-input" data-page-node-id="hYsaBx4nADR2CSNbMYNhr0">
+              <option value="all" data-page-node-id="PrWymwewUH7HIWXBIRUWpE">全部</option>
+              <option value="政治理论" data-page-node-id="frhMhulaMPJ51D1Mn1zE3s">政治理论</option>
+              <option value="常识" data-page-node-id="kO4ZZcTEGcu3jSCTRL9YeR">常识</option>
+              <option value="言语理解" data-page-node-id="MEgxas3UEdUc1ZJd1eahrD">言语理解</option>
+              <option value="逻辑判断" data-page-node-id="Ihg0h3Zi8uAB23eJP3OvBx">逻辑判断</option>
+              <option value="数量关系" data-page-node-id="ma94XHg3W6LBgrCaW0oBUb">数量关系</option>
+              <option value="资料分析" data-page-node-id="fkF7AsbXqMWGPr3E9WIEHN">资料分析</option>
+              <option value="申论" data-page-node-id="duEHRfYoBcYEANhq03Pj42">申论</option>
+            </select>
+          </div>
+          <div class="card-body" data-page-node-id="vtZSfYCSo6psbvSHW5sFBW">
+            <div class="err-list" id="errList" data-page-node-id="YzeIeRMbLsmJ6Dmqh7Plih"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 欢迎页 -->
+      <section class="view active" data-view="home" data-page-node-id="AUX7RPz0fHQGkWvh6w4RcK">
+        <div class="welcome" data-page-node-id="zukLURtAiATgxHjOxbNLM5">
+          <div class="welcome-card" data-page-node-id="3H48ZJwoT8exNBjCsjbBzk">
+            <div class="welcome-icon" data-page-node-id="bkLTBQTjO4cO1GqKo2xmQV">🐰</div>
+            <h1 data-page-node-id="Kd081mNjUgDrUY3USMwqnB">欢迎来到备考兔 · 上岸工作台</h1>
+            <p class="muted" data-page-node-id="w6nhZXI50XcJndCdasQyYE">每天进步一点点，上岸就在眼前 ✨</p>
+            <div class="welcome-tips" data-page-node-id="g1rxouT5CzMffXrjo2WaBU">
+              <div class="tip-item" data-page-node-id="3z8HYXjjBCYjmEmChDkv2k">📚 <b data-page-node-id="61O2pyhsOiHHw3LF5e0iDe">左侧导航</b> 选择模块</div>
+              <div class="tip-item" data-page-node-id="nD9u5t4hEPhyhc6JLMNSri">💾 所有数据 <b data-page-node-id="xlfntjyH2d0b0EiP4rDLiY">本地保存</b></div>
+              <div class="tip-item" data-page-node-id="CEPFfkuhBL8B7596LKvSKS">📱 <b data-page-node-id="fm3wCPmTpwqjQce12omspk">手机和电脑</b> 都能用</div>
+              <div class="tip-item" data-page-node-id="TdcZR9AFekxPfKDbwTcx7i">🐰 点头像可 <b data-page-node-id="Kc2anDWasaXvxEavt1O8iG">自定义</b> 头像/昵称</div>
+            </div>
+            <button class="primary-btn big" id="gotoCountdown" data-page-node-id="RpqEl3MQDNufrabv3C5LE2">开始今日打卡 →</button>
+            <div style="margin-top:14px" data-page-node-id="RMvHESZER0RNgOtXRLOh62">
+              <button class="ghost-btn" id="loadDemoBtn" data-page-node-id="ZiwcyY0o0ViNKNdNfaLOIU">✨ 一键加载示例数据</button>
+              <button class="ghost-btn" id="clearAllBtn" data-page-node-id="fAaxAKhp08YDdvmlSkAdHS">🗑️ 清空全部数据</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" data-page-node-id="8UEHHq38GvV49BlUFhhAwf"></div>
+
+  <!-- 番茄钟浮动按钮 -->
+  <button class="pomofab" id="pomoFab" title="番茄钟" data-page-node-id="5wJCDY0d7zAlNQ0HsAyHwo">🍅</button>
+
+  <!-- 番茄钟面板 -->
+  <div class="pomo-panel" id="pomoPanel" hidden data-page-node-id="lb74uhHcGVGkavXXCRUhrv">
+    <div class="pomo-head" data-page-node-id="7C75kflQRTTiimZLz7sMRG">
+      <span class="pomo-title" data-page-node-id="tE5NVrFEVoFj2cZu3mTBva">🍅 番茄钟</span>
+      <button class="pomo-close" id="pomoClose" data-page-node-id="dv9WMej6G9Z1XqQKQg6egj">✕</button>
+    </div>
+    <div class="pomo-tabs" data-page-node-id="WLRSFLZGCGcRrACOAAwqi8">
+      <button class="pomo-tab active" data-mode="focus" data-page-node-id="EtVGotQiiJ5iv3wVY5p8s7">专注 25'</button>
+      <button class="pomo-tab" data-mode="rest" data-page-node-id="LavOr5UV54roEYtUPl61vi">休息 5'</button>
+    </div>
+    <div class="pomo-time" id="pomoTime" data-page-node-id="QxE7ARNTEEXJPfbOmifjiK">25:00</div>
+    <div class="pomo-progress" data-page-node-id="HlVuw3QqMnqlapq2M2AVmi"><div class="pomo-bar" id="pomoBar" data-page-node-id="8sL0ANcP446egIUd2TDccN"></div></div>
+    <select id="pomoModule" class="select-input" style="margin: 10px 0;" data-page-node-id="Gm0IeIbAPJOWvCetQJjlXz">
+      <option value="" data-page-node-id="e7FIKw3GADGt4nu2FTVlGI">不关联模块</option>
+      <option value="政治理论" data-page-node-id="VpXDsfPrL2THRsYwsmE4hy">政治理论</option>
+      <option value="常识" data-page-node-id="F88TBWoEB8vvGzuI0d53zN">常识</option>
+      <option value="言语理解" data-page-node-id="DZtKQb2azlq9mxXhrSnSha">言语理解</option>
+      <option value="逻辑判断" data-page-node-id="AHjy9ITGXCcG8ZkINhjh0a">逻辑判断</option>
+      <option value="数量关系" data-page-node-id="0yG09HhyZwy8BY0TvTG2qU">数量关系</option>
+      <option value="资料分析" data-page-node-id="BqOHABZsWYJlCjoTyYNpZ9">资料分析</option>
+      <option value="申论" data-page-node-id="Qy9dEwHjutuu2EsdxtoBtQ">申论</option>
+    </select>
+    <div class="pomo-actions" data-page-node-id="Bc53qW5ycpMEcUDP1kqCnW">
+      <button class="primary-btn" id="pomoStart" data-page-node-id="viyHl7moH4Z62dGaiFqa7b">▶ 开始</button>
+      <button class="ghost-btn" id="pomoReset" data-page-node-id="XEOrSECW2mGBGt36liL842">↺ 重置</button>
+    </div>
+    <div class="pomo-stat muted" data-page-node-id="2hfH1fCKenLnpJUnhXuV63">
+      今日完成：<b id="pomoCount" data-page-node-id="EOwANg6aHKZrIJP3GYAucI">0</b> 个番茄
+    </div>
+  </div>
+
+  <div class="pomo-modal" id="pomoModal" hidden data-page-node-id="ijXynF9ICgLTL1Qegv6jbn">
+    <div class="pomo-modal-card" data-page-node-id="N24KoFm0W77jXYFldhSWik">
+      <div class="pomo-modal-icon" data-page-node-id="b8qLIHkbjqM3aXX8L2l1Mz">🎉</div>
+      <div class="pomo-modal-text" id="pomoModalText" data-page-node-id="8LQNDhe4FAgRvoPygEVfbh">已完成一个番茄！</div>
+      <button class="primary-btn" id="pomoModalOk" data-page-node-id="ns6E8tp4iSykJ2NkG6jZg1">继续加油</button>
+    </div>
+  </div>
+
+  <!-- 语音识别 -->
+  <div class="voice-modal" id="voiceModal" hidden data-page-node-id="W4TzJnEroRGdcVfLp45xdp">
+    <div class="voice-card" data-page-node-id="nrwga5NYYnIWfcDHrLIDAY">
+      <div class="voice-icon" data-page-node-id="YnglVxgrXTCKw31ZDoBLqJ">🎙️</div>
+      <div class="voice-text" id="voiceText" data-page-node-id="dEMXIJcGAxUirbOgwp1CBL">请开始说话...</div>
+      <div class="voice-actions" data-page-node-id="yp1uHZf4UZH9t4g9lfMT0l">
+        <button class="ghost-btn" id="voiceCancel" data-page-node-id="JKamBjGueh81zngAdeO4Tv">取消</button>
+        <button class="primary-btn" id="voiceConfirm" data-page-node-id="AwYqex76JXfTwaxAYl83Wl">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 头像/昵称编辑弹窗 -->
+  <div class="modal" id="profileModal" hidden data-page-node-id="UYR0E0UwoYvV5rhbnwHBD1">
+    <div class="modal-card" data-page-node-id="s8raLj6Avbq4aTZebRQoZk">
+      <div class="modal-title" data-page-node-id="Dh4OHQVf28ayAzYf0Umo2g">✏️ 编辑资料</div>
+      <div class="modal-row" data-page-node-id="QpxyPZU4lqrbYyLtAyvczm">
+        <label data-page-node-id="RietxTHkCRt9gXGCMtd2ad">昵称（最多 12 字）</label>
+        <input type="text" id="nicknameInput" class="text-input" maxlength="12" placeholder="备考兔" data-page-node-id="vMRKorkFdIXLyk2wf0ho0C">
+      </div>
+      <div class="modal-row" data-page-node-id="PpdSx1blEO8gTiS4BTp2F1">
+        <label data-page-node-id="za8R8b5dQCA6XYykjCxFHJ">座右铭</label>
+        <input type="text" id="mottoInput" class="text-input" maxlength="40" placeholder="每天进步一点点" data-page-node-id="VRHu2eDMEyV5yzngZYzoCW">
+      </div>
+      <div class="modal-actions" data-page-node-id="r2bPngi174Ectn4GY9qsUI">
+        <button class="ghost-btn" id="profileCancel" data-page-node-id="MrEWTqY7B9rvVC8objHvJv">取消</button>
+        <button class="primary-btn" id="profileSave" data-page-node-id="QyqtuYq338SvKoSCKrjGa1">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 课程笔记编辑弹窗 -->
+  <div class="modal" id="noteModal" hidden data-page-node-id="9ynrjd6s2BLug0FLElxUjw">
+    <div class="modal-card" data-page-node-id="GYUuW7PyUlq8MyDLitwwR4">
+      <div class="modal-title" data-page-node-id="xDoXNoLbEJ63o80J9Z0UDf">🗒️ <span id="noteTitle" data-page-node-id="kksM334s3M3eYt0XhTZCzB">课程笔记</span></div>
+      <div class="modal-row" data-page-node-id="mteNvoGddaVGvT2qayXkoz">
+        <textarea id="noteText" class="text-input" rows="5" placeholder="写下这节课的笔记、易错点、重点..."></textarea>
+      </div>
+      <div class="modal-row" data-page-node-id="PQxLVpaTLdmtxlflOjNVAG">
+        <label class="ghost-btn" for="noteImage" data-page-node-id="bxf8MPcDtHRvKYUeULeaRh">📷 上传图片</label>
+        <input type="file" id="noteImage" accept="image/*" hidden data-page-node-id="3urlRKsv5rZWTPszgxh8qR">
+        <span class="muted" id="noteImageLabel" data-page-node-id="heYsYaRQ1aowIIuf5EDPqL"></span>
+      </div>
+      <div class="modal-row" id="noteImagePreviewWrap" hidden data-page-node-id="01Jz06GSj8DSrVTCC1wCQr">
+        <img id="noteImagePreview" class="note-img-preview" alt="笔记图片" data-page-node-id="ESEe8aIobu3KFxJGnGlAVv">
+      </div>
+      <div class="modal-actions" data-page-node-id="Z99ZA99sRkHl0H1pkHt5q8">
+        <button class="ghost-btn" id="noteCancel" data-page-node-id="AN9nM3LMUmXR2kCDqMf6mm">取消</button>
+        <button class="primary-btn" id="noteSave" data-page-node-id="WflQ4Sef7jYJ7EtYdMYZ60">保存笔记</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 云端同步配置弹窗 -->
+  <div class="modal" id="syncModal" hidden data-page-node-id="syncModalNode">
+    <div class="modal-card" data-page-node-id="syncModalCard">
+      <div class="modal-title" data-page-node-id="syncModalTitle">☁️ 云端同步（Supabase）</div>
+      <div class="modal-row" data-page-node-id="syncUrlRow">
+        <label data-page-node-id="syncUrlLabel">Supabase URL</label>
+        <input type="text" id="syncUrl" class="text-input" placeholder="https://xxxx.supabase.co" data-page-node-id="syncUrlInput">
+      </div>
+      <div class="modal-row" data-page-node-id="syncKeyRow">
+        <label data-page-node-id="syncKeyLabel">anon key</label>
+        <input type="text" id="syncKey" class="text-input" placeholder="public anon key" data-page-node-id="syncKeyInput">
+      </div>
+      <div class="modal-row" data-page-node-id="syncCodeRow">
+        <label data-page-node-id="syncCodeLabel">同步码（可选）</label>
+        <input type="text" id="syncCode" class="text-input" placeholder="多端需一致，用于加密隐私" data-page-node-id="syncCodeInput">
+      </div>
+      <div class="modal-row muted" id="syncStatus" data-page-node-id="syncStatusNode">未连接</div>
+      <div class="modal-actions" data-page-node-id="syncActions">
+        <button class="ghost-btn" id="syncTestBtn" data-page-node-id="syncTestBtnN">连接测试</button>
+        <button class="ghost-btn" id="syncPushBtn" data-page-node-id="syncPushBtnN">⬆️ 上传</button>
+        <button class="ghost-btn" id="syncPullBtn" data-page-node-id="syncPullBtnN">⬇️ 下载</button>
+        <button class="primary-btn" id="syncSaveBtn" data-page-node-id="syncSaveBtnN">保存并启用</button>
+        <button class="ghost-btn" id="syncDisconnectBtn" data-page-node-id="syncDisconnectBtnN">断开</button>
+        <button class="ghost-btn" id="syncCancel" data-page-node-id="syncCancelN">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 错题库导出弹窗 -->
+  <div class="modal" id="exportModal" hidden data-page-node-id="fk72KTZTKk8Jeehw8TFzrB">
+    <div class="modal-card" data-page-node-id="ROYO3jOEOrTovr9VJ8RtLi">
+      <div class="modal-title" data-page-node-id="Ge2plBpMWOYdTFrFLvFes5">📤 导出错题本</div>
+      <div class="modal-row muted" id="exportCount" data-page-node-id="fQuoHYcTc574jLn2V2wWRq">当前共 0 道错题</div>
+      <div class="modal-row export-opts" data-page-node-id="yZiY5f2TQJRibDsxLSBx51">
+        <button class="export-opt" data-type="word" data-page-node-id="Is3521ONKFTZFAK3OOyVtW">📘 导出为 Word</button>
+        <button class="export-opt" data-type="pdf" data-page-node-id="VytPZ9hwLNXKA3Rj8UrJjG">📕 导出为 PDF</button>
+      </div>
+      <div class="modal-actions" data-page-node-id="wudyjBysdkftVoIS1cOYCP">
+        <button class="ghost-btn" id="exportCancel" data-page-node-id="uTHPKn01vagyShL5ZxCTEB">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="study_plan.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').catch(err => console.warn('SW注册失败', err));
+    }
+  </script>
+</body>
+</html>
