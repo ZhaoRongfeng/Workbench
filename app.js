@@ -1338,12 +1338,19 @@ const supaHeaders = () => ({
   'Content-Type': 'application/json'
 });
 // 从 Supabase 错误响应中提取具体原因（如 Invalid API key），便于定位 401/404 等问题
+const supaHint = (m) => {
+  if (/row-level security/i.test(m)) return ' 👉 云表权限未开：请到 Supabase → SQL Editor 重新运行 supabase_schema.sql（会关闭 RLS 并授权），再回来上传';
+  if (/permission denied/i.test(m)) return ' 👉 云表缺少授权：请在 SQL Editor 运行 supabase_schema.sql 第 3 步的 grant 语句';
+  if (/Invalid API key|No API key/i.test(m)) return ' 👉 key 无效：请重新复制 Project Settings → API 里的 Publishable key（勿带空格换行）';
+  if (/relation .* does not exist/i.test(m)) return ' 👉 表未创建：请在 SQL Editor 运行 supabase_schema.sql';
+  return '';
+};
 const supaErrMsg = async (res) => {
   let detail = '';
   try {
     const j = await res.json();
     const m = j && (j.msg || j.message || j.error_description || j.error);
-    if (m) detail = '：' + m;
+    if (m) detail = '：' + m + supaHint(String(m));
   } catch (_) {}
   return 'HTTP ' + res.status + detail;
 };

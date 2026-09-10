@@ -48,8 +48,12 @@
 | 现象 | 原因 / 解决 |
 |---|---|
 | 测试连接失败 | URL 漏了 `https://`；anon key 复制不全；第二步的表没建成 |
+| **上传报 `new row violates row-level security policy`** | 表的写入被 RLS 拦住。到 SQL Editor **重新完整运行一遍 `supabase_schema.sql`**（脚本会关闭 RLS 并授权 anon/authenticated），再回来上传 |
+| 上传报 `permission denied for table workspace_sync` | 表缺少授权。运行脚本第 3 步的 `grant all on workspace_sync to anon, authenticated;` |
 | 手机能连上但数据是空的/解不开 | **三台设备的同步码必须一字不差**（含大小写和符号） |
 | 换了设备找不到配置 | 凭证只存在浏览器本地，重新填一次即可（不会泄露） |
+
+> 💡 `supabase_schema.sql` 是**幂等**的，可以放心重复运行：不会重建表、不会清空已有数据，还能把 RLS / 授权 / 预置数据行一次性补齐。遇到任何云端写入报错，**先重跑一遍它**。
 
 ## 安全说明（为什么这样做是安全的）
 
