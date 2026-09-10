@@ -1446,9 +1446,15 @@ const openSyncModal = () => {
   setSyncStatus(state.sync.enabled ? ('☁️ 已启用，上次：' + (state.sync.lastSync || '无')) : '未连接');
   $('#syncModal').hidden = false;
 };
+const cleanSyncKey = (v) => (v || '').replace(/\s+/g, ''); // 去掉所有空白（含中间换行，手机复制粘贴常见）
+const syncWarn = (url, key) => {
+  if (!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(url || '')) return '⚠️ URL 应形如 https://xxxx.supabase.co（不带路径，不要用 postgres 连接串）';
+  if (key && !/^(eyJ|sb_publishable_)/.test(key)) return '⚠️ key 应以 sb_publishable_ 开头（新版）或 eyJ 开头（旧版 anon key）';
+  return '';
+};
 const saveSyncConfig = () => {
-  state.sync.url = $('#syncUrl').value.trim();
-  state.sync.anonKey = $('#syncKey').value.trim();
+  state.sync.url = $('#syncUrl').value.trim().replace(/\/+$/, '');
+  state.sync.anonKey = cleanSyncKey($('#syncKey').value);
   state.sync.code = $('#syncCode').value.trim();
   state.sync.enabled = !!(state.sync.url && state.sync.anonKey);
   saveState();
@@ -1457,8 +1463,11 @@ const saveSyncConfig = () => {
   if (state.sync.enabled) pushToCloud();
 };
 const testSync = async () => {
-  const url = $('#syncUrl').value.trim(), key = $('#syncKey').value.trim();
+  const url = $('#syncUrl').value.trim().replace(/\/+$/, ''), key = cleanSyncKey($('#syncKey').value);
+  $('#syncUrl').value = url; $('#syncKey').value = key;
   if (!url || !key) { setSyncStatus('⚠️ 请填写 URL 和 anon key'); return; }
+  const warn = syncWarn(url, key);
+  if (warn) { setSyncStatus(warn); toast(warn, 'error'); return; }
   setSyncStatus('🔄 测试中…');
   try {
     const base = url.replace(/\/$/, '');
