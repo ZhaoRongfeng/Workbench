@@ -75,7 +75,7 @@ const defaultState = () => ({
   qtyIdx: null,
   progress: { language: {}, politics: {}, commonSense: {}, dataAnalysis: {} },
   notes: {},
-  profile: { avatar: '', nickname: '备考兔', motto: '每天进步一点点，上岸就在眼前 ✨' },
+  profile: { avatar: '', emoji: '🐰', nickname: '备考兔', motto: '每天进步一点点，上岸就在眼前 ✨' },
   pref: { navFolded: false, font: 'm', pastOffset: 0 },
   politicsToday: [],
   politicsPast: [],
@@ -1123,27 +1123,63 @@ const pomoReset = () => { if (pomoRunning && !confirm('正在计时中，确定�
 const togglePomoPanel = () => { const panel = $('#pomoPanel'); if (panel.hidden) { loadPomoToday(); panel.hidden = false; pomoRender(); } else panel.hidden = true; };
 
 /* ---------- 头像 / 昵称 ---------- */
+const AVATAR_EMOJIS = ['🐰', '🐱', '🐶', '🦊', '🐼', '🦁', '🐯', '🐨', '🐸', '🐧', '🦉', '🎓'];
+const renderAvatar = (el, size) => {
+  if (!el) return;
+  const p = state.profile;
+  if (p.avatar) el.innerHTML = `<img src="${p.avatar}" alt="头像">`;
+  else el.textContent = p.emoji || '🐰';
+};
 const loadProfile = () => {
   const p = state.profile;
-  const av = $('#avatar');
-  if (p.avatar) av.innerHTML = `<img src="${p.avatar}" alt="头像">`; else av.textContent = '🐰';
+  renderAvatar($('#avatar'));
+  renderAvatar($('#avatarPreview'));
   $('#nickname').innerHTML = escapeHtml(p.nickname) + ' <span class="edit-ico">✏️</span>';
   $('#motto').textContent = p.motto;
 };
-const compressAvatar = (file, cb) => {
+// 选择图片 → 压缩 → 保存。做了多重兜底：超时保护、大图走 createImageBitmap、
+// 压缩失败降级用原图（过大则提示），任何环节失败都会明确提示而不是静默无反应。
+const setAvatarImage = (dataUrl) => {
+  state.profile.avatar = dataUrl; saveState(); loadProfile(); toast('头像已更新');
+};
+const handleAvatarFile = (file) => {
+  if (!file) return;
+  if (file.type && !/^image\//.test(file.type)) { toast('请选择图片文件', 'error'); return; }
+  let done = false;
+  const finish = (b64, raw) => {
+    if (done) return; done = true; clearTimeout(timer);
+    if (b64) { setAvatarImage(b64); return; }
+    if (raw && raw.length < 2000000) { setAvatarImage(raw); return; }
+    toast(raw ? '图片过大，请先截图或压缩后再试' : '图片读取失败，换一张试试', 'error');
+  };
+  const timer = setTimeout(() => { if (!done) { done = true; toast('图片处理超时，请换一张或先截图再试', 'error'); } }, 15000);
   const reader = new FileReader();
+  reader.onerror = () => finish(null, null);
   reader.onload = (e) => {
-    const img = new Image();
-    img.onload = () => {
-      const scale = 300 / img.width;
-      const w = 300, h = Math.round(img.height * scale);
-      const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      cb(canvas.toDataURL('image/jpeg', 0.85));
+    const src = String(e.target.result || '');
+    if (!src) { finish(null, null); return; }
+    const toCanvas = (draw, w0) => {
+      try {
+        const scale = Math.min(1, 300 / (w0 || 300));
+        const w = Math.max(1, Math.round((w0 || 300) * scale)), h = Math.max(1, Math.round((draw.height || w) * scale));
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        c.getContext('2d').drawImage(draw, 0, 0, w, h);
+        const out = c.toDataURL('image/jpeg', 0.85);
+        out && out.length > 100 ? finish(out, src) : finish(null, src);
+      } catch (_) { finish(null, src); }
     };
-    img.onerror = () => cb(null);
-    img.src = e.target.result;
+    const viaImg = () => {
+      const img = new Image();
+      img.onload = () => toCanvas(img, img.width);
+      img.onerror = () => finish(null, src);
+      img.src = src;
+    };
+    // 手机大图走 createImageBitmap 更稳（部分浏览器对超大图 <img> 解码会失败）
+    if (window.createImageBitmap && window.Blob && src.length > 1500000) {
+      fetch(src).then(r => r.blob()).then(createImageBitmap)
+        .then(bmp => toCanvas(bmp, bmp.width))
+        .catch(viaImg);
+    } else viaImg();
   };
   reader.readAsDataURL(file);
 };
@@ -1215,15 +1251,13 @@ const bindEvents = () => {
     state.pref.pastOffset = (state.pref.pastOffset || 0) + 1; saveState(); renderPolitics(); toast('已换一批');
   });
 
-  $('#avatarWrap').addEventListener('click', () => $('#avatarInput').click());
-  $('#avatarInput').addEventListener('change', (e) => {
-    const f = e.target.files[0]; if (!f) return;
-    compressAvatar(f, (b64) => {
-      if (!b64) { toast('图片读取失败', 'error'); return; }
-      state.profile.avatar = b64; saveState(); loadProfile(); toast('头像已更新');
-    });
-    e.target.value = '';
+  const pickAvatar = (inputId) => { const el = $(inputId); if (el) el.click(); };
+  $('#avatarWrap').addEventListener('click', () => pickAvatar('#avatarInput'));
+  [['#avatarInput'], ['#avatarInput2']].forEach(([sel]) => {
+    const el = $(sel); if (!el) return;
+    el.addEventListener('change', (e) => { handleAvatarFile(e.target.files[0]); e.target.value = ''; });
   });
+  $('#avatarPickBtn').addEventListener('click', () => pickAvatar('#avatarInput2'));
   $('#profileBox').addEventListener('click', (e) => {
     if (e.target.closest('#avatarWrap')) return;
     openProfileModal();
@@ -1283,6 +1317,20 @@ const bindEvents = () => {
 const openProfileModal = () => {
   $('#nicknameInput').value = state.profile.nickname === '备考兔' ? '' : state.profile.nickname;
   $('#mottoInput').value = state.profile.motto;
+  renderAvatar($('#avatarPreview'));
+  const presets = $('#avatarPresets');
+  if (presets && !presets.dataset.init) {
+    presets.dataset.init = '1';
+    AVATAR_EMOJIS.forEach((em) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'avatar-preset'; b.textContent = em;
+      b.addEventListener('click', () => {
+        state.profile.avatar = ''; state.profile.emoji = em;
+        saveState(); loadProfile(); toast('头像已更新');
+      });
+      presets.appendChild(b);
+    });
+  }
   $('#profileModal').hidden = false;
 };
 
