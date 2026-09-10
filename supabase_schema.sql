@@ -10,6 +10,10 @@ create table if not exists workspace_sync (
   updated_at timestamptz default now()
 );
 
+-- 预置 id='main' 数据行：PATCH 只能更新已存在的行，空表会导致首次上传静默失败。
+-- 重复运行无副作用（on conflict do nothing）。已建过表的老用户可单独运行这一条。
+insert into workspace_sync (id, data) values ('main', '') on conflict (id) do nothing;
+
 -- 开启行级安全（RLS）
 alter table workspace_sync enable row level security;
 

@@ -1384,11 +1384,14 @@ const pushToCloud = async () => {
         }
       }
     } catch (_) { /* 探测失败不阻断正常上传 */ }
-    const headers = { ...supaHeaders(), 'Prefer': 'resolution=merge-duplicates' };
-    let res = await fetch(`${base}/rest/v1/workspace_sync?id=eq.main`, {
-      method: 'PATCH', headers, body: JSON.stringify({ data: payload, updated_at: new Date().toISOString() })
-    });
-    if (res.status === 404) {
+    const headers = { ...supaHeaders(), 'Prefer': 'resolution=merge-duplicates,return=representation' };
+    const body = JSON.stringify({ data: payload, updated_at: new Date().toISOString() });
+    // PATCH 只能更新已有行；PostgREST 对「零行命中」也返回 200（而非 404），
+    // 因此必须检查返回的行数：空数组说明首次上传、行还不存在，需改用 POST upsert 插入
+    let res = await fetch(`${base}/rest/v1/workspace_sync?id=eq.main`, { method: 'PATCH', headers, body });
+    let rows = [];
+    try { rows = await res.json(); } catch (_) { rows = []; }
+    if (!res.ok || !Array.isArray(rows) || rows.length === 0) {
       res = await fetch(`${base}/rest/v1/workspace_sync`, {
         method: 'POST', headers, body: JSON.stringify({ id: 'main', data: payload, updated_at: new Date().toISOString() })
       });
