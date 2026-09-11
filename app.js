@@ -1246,7 +1246,7 @@ const renderExamInfoList = () => {
         </div>
       </div>
       <div class="info-card-body">${escapeHtml(item.content || '').replace(/\n/g, '<br>')}</div>
-      ${(item.links && item.links.length) ? `<div class="info-card-links">${item.links.map(l => `<a class="info-link" href="${escapeAttr(l.url)}" target="_blank" rel="noopener">${escapeHtml(l.label || '链接')}</a>`).join('')}</div>` : ''}
+      ${(item.links && item.links.length) ? `<div class="info-card-links">${item.links.map(l => `<a class="info-link" href="${escapeAttr(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(l.label || '链接')}</a>`).join('')}</div>` : ''}
       ${item.talk ? `
         <div class="info-talk-card">
           <div class="info-talk-title">【${escapeHtml(item.talk.title)}】</div>
@@ -2229,16 +2229,6 @@ const init = () => {
   renderTopbar();
   // 番茄钟收起状态（持久化）
   try { applyPomoHidden(localStorage.getItem(POMO_HIDDEN_KEY) === '1'); } catch (_) {}
-  // 外部链接统一新标签打开，避免 PWA 内跳转后无法返回
-  document.addEventListener('click', (e) => {
-    const a = e.target.closest && e.target.closest('a');
-    if (!a) return;
-    const href = a.getAttribute('href') || '';
-    if (/^https?:\/\//i.test(href)) {
-      e.preventDefault();
-      window.open(href, '_blank', 'noopener,noreferrer');
-    }
-  }, true);
   const hash = location.hash.replace('#', '');
   navigate(ROUTES.includes(hash) ? hash : 'home');
 };
