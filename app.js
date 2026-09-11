@@ -186,6 +186,8 @@ const COURSE_FOR_ROUTE = { 'politics':'politics','common-sense':'commonSense','l
 
 const navigate = (route) => {
   if (!ROUTES.includes(route)) route = 'home';
+  // 离开百分化游戏时停表并收起弹层（保留进度，回来可继续）
+  if (route !== 'tool-percent') { try { stopPcfTimer(); closePcfOverlay(); } catch (_) {} }
   $$('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.route === route));
   $$('.view').forEach(v => v.classList.toggle('active', v.dataset.view === route));
   onEnter(route);
@@ -1302,6 +1304,9 @@ const openExternalLink = (url) => {
   if (!url || !/^https?:\/\//i.test(url)) return;
   externalLinkTargetUrl = url;
   $('#externalLinkUrl').textContent = url;
+  // 「打开」按钮是原生 <a>，把真实地址写进 href，由浏览器直接新标签跳转
+  const openBtn = $('#externalLinkOpen');
+  if (openBtn) openBtn.setAttribute('href', url);
   $('#externalLinkModal').hidden = false;
 };
 
@@ -1690,13 +1695,8 @@ const bindEvents = () => {
 
   // 外部链接确认弹窗(避免 PWA 里直接跳走后找不到返回入口)
   $('#externalLinkCancel').addEventListener('click', () => { $('#externalLinkModal').hidden = true; externalLinkTargetUrl = ''; });
-  $('#externalLinkOpen').addEventListener('click', () => {
-    if (externalLinkTargetUrl) {
-      const w = window.open(externalLinkTargetUrl, '_blank', 'noopener,noreferrer');
-      if (!w) toast('浏览器拦截了弹窗，请从最近任务切回后重试', 'error');
-    }
-    $('#externalLinkModal').hidden = true;
-  });
+  // 「打开」是原生 <a target="_blank">，交给浏览器本身跳转（不再用 window.open，避免被移动端弹窗拦截）
+  $('#externalLinkOpen').addEventListener('click', () => { $('#externalLinkModal').hidden = true; });
   $('#examInfoList').addEventListener('click', (e) => {
     const a = e.target.closest('.info-link');
     if (!a) return;
@@ -2021,57 +2021,349 @@ const rnd = (n) => Math.floor(Math.random() * n);
 const pick = (arr) => arr[rnd(arr.length)];
 const shuffle = (arr) => arr.map(x => [Math.random(), x]).sort((a, b) => a[0] - b[0]).map(p => p[1]);
 
-/* ---------- 1) 百分化游戏：分数 → 百分数 四选一 ---------- */
-const toolPercent = { score: 0, total: 0 };
-const nextPercent = () => {
-  const denoms = [2, 4, 5, 8, 10, 20, 25, 40, 50];
-  const d = pick(denoms); const n = 1 + rnd(d - 1);
-  const correct = Math.round(n / d * 1000) / 10;
-  const opts = new Set([correct]);
-  let guard = 0;
-  while (opts.size < 4 && guard++ < 50) {
-    const delta = (1 + rnd(5)) * (Math.random() < 0.5 ? -1 : 1) * 0.1 * 10;
-    const v = Math.round((correct + delta) * 10) / 10;
-    if (v > 0 && v < 100) opts.add(v);
-  }
-  toolPercent.q = `${n}/${d}`;
-  toolPercent.ans = correct;
-  toolPercent.opts = shuffle(Array.from(opts));
+/* ---------- 1) 百分化游戏：学习 / 闯关 / 自由 三种模式 ---------- */
+/* 巧记百化分对照表（4 组配色，参考小红书"巧记百化分"） */
+const PCF_TABLE = [
+  { group: 'blue', label: '不用背也会', items: [
+    ['1/2', '50%'], ['1/3', '33.3%'], ['1/4', '25%'], ['1/5', '20%'],
+    ['1/20', '5%'], ['1/25', '4%'], ['1/30', '3.3%'], ['1/33', '3%'], ['1/40', '2.5%'], ['1/50', '2%'],
+  ] },
+  { group: 'yellow', label: '5.963 等差数列', items: [
+    ['1/17', '5.9%'], ['1/18', '5.6%'], ['1/19', '5.3%'],
+    ['1/5.3', '19%'], ['1/5.6', '18%'], ['1/5.9', '17%'],
+  ] },
+  { group: 'green', label: '母子互换', items: [
+    ['1/6', '16.7%'], ['1/7', '14.3%'], ['1/14', '7.1%'], ['1/15', '6.7%'], ['1/16', '6.25%'],
+    ['1/6.5', '15.4%'], ['1/7.5', '13.3%'],
+  ] },
+  { group: 'red', label: '加和为 20', items: [
+    ['1/8', '12.5%'], ['1/9', '11.1%'], ['1/11', '9.1%'], ['1/12', '8.3%'], ['1/13', '7.7%'],
+    ['1/8.5', '11.8%'], ['1/9.5', '10.5%'], ['1/10', '10%'], ['1/12.5', '8%'],
+    ['1/13.5', '7.4%'], ['1/14.5', '6.9%'], ['1/15.5', '6.5%'], ['1/16.5', '6%'],
+  ] },
+];
+const PCF_POOL = [];
+PCF_TABLE.forEach(g => g.items.forEach(([f, p]) => PCF_POOL.push({ frac: f, pct: p })));
+
+/* 闯关模式：15 关 · 三种棋盘（4×4 / 4×6 / 6×6），限时递减 */
+const PCF_LEVELS = [
+  { rows: 4, cols: 4, time: 100 }, { rows: 4, cols: 4, time: 90 }, { rows: 4, cols: 4, time: 80 },
+  { rows: 4, cols: 4, time: 70 }, { rows: 4, cols: 4, time: 60 },
+  { rows: 4, cols: 6, time: 140 }, { rows: 4, cols: 6, time: 125 }, { rows: 4, cols: 6, time: 110 },
+  { rows: 4, cols: 6, time: 95 }, { rows: 4, cols: 6, time: 80 },
+  { rows: 6, cols: 6, time: 200 }, { rows: 6, cols: 6, time: 180 }, { rows: 6, cols: 6, time: 160 },
+  { rows: 6, cols: 6, time: 140 }, { rows: 6, cols: 6, time: 120 },
+];
+const PCF_FREE_SIZES = [{ rows: 4, cols: 4 }, { rows: 4, cols: 5 }, { rows: 4, cols: 6 }, { rows: 6, cols: 6 }];
+const PCF_CHALLENGE_HINTS = 3;
+const PCF_FREE_HINTS = 5;
+const PCF_LEVEL_LS = 'shangan_pcf_level';
+
+const pcf = {
+  screen: 'menu', mode: 'study',
+  board: [], sel: [], rows: 4, cols: 5,
+  matched: 0, totalPairs: 0, hintsLeft: Infinity,
+  elapsed: 0, timeLimit: 0, remain: 0,
+  paused: false, locked: false, level: 1, timerId: null,
 };
+
+const fmtMS = (s) => {
+  s = Math.max(0, Math.floor(s));
+  const m = Math.floor(s / 60), r = s % 60;
+  return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`;
+};
+/* 值 = 当前可挑战的关卡号；等于 关卡数+1 表示已全部通关 */
+const pcfBestLevel = () => {
+  try { return Math.max(1, Math.min(PCF_LEVELS.length + 1, parseInt(localStorage.getItem(PCF_LEVEL_LS) || '1', 10) || 1)); }
+  catch (_) { return 1; }
+};
+const pcfSaveBest = (n) => {
+  try { if (n > pcfBestLevel() && n <= PCF_LEVELS.length + 1) localStorage.setItem(PCF_LEVEL_LS, String(n)); } catch (_) {}
+};
+
+const stopPcfTimer = () => { if (pcf.timerId) { clearInterval(pcf.timerId); pcf.timerId = null; } };
+const resumePcfTimer = () => {
+  if (pcf.screen !== 'game' || pcf.timerId) return;
+  pcf.timerId = setInterval(() => {
+    if (pcf.paused || pcf.screen !== 'game') return;
+    pcf.elapsed++;
+    if (pcf.timeLimit) {
+      pcf.remain = pcf.timeLimit - pcf.elapsed;
+      if (pcf.remain <= 0) { pcf.remain = 0; paintPcfTimer(); stopPcfTimer(); pcfResult(false); return; }
+    }
+    paintPcfTimer();
+  }, 1000);
+};
+
+/* ---------- 弹层（百化分表 / 选关 / 选棋盘 / 暂停 / 结算） ---------- */
+const closePcfOverlay = () => { const ov = $('#pcfOverlay'); if (ov) { ov.hidden = true; ov.innerHTML = ''; } };
+const pcfOverlay = (title, bodyHtml, onMount) => {
+  let ov = $('#pcfOverlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'pcfOverlay'; ov.className = 'pcf-overlay'; ov.hidden = true;
+    document.body.appendChild(ov);
+  }
+  ov.innerHTML = `<div class="pcf-sheet-card">
+      <div class="pcf-sheet-head"><b>${title}</b><button type="button" class="pcf-sheet-close" id="pcfSheetClose">✕</button></div>
+      <div class="pcf-sheet-body">${bodyHtml}</div>
+    </div>`;
+  ov.hidden = false;
+  $('#pcfSheetClose').addEventListener('click', closePcfOverlay);
+  ov.onclick = (e) => { if (e.target === ov) closePcfOverlay(); };
+  if (onMount) onMount(ov);
+};
+
+const openPcfTable = () => {
+  const body = PCF_TABLE.map(g => `
+    <div class="pcf-tgroup ${g.group}">
+      <div class="pcf-tgroup-title">${g.label}</div>
+      <div class="pcf-tgrid">${g.items.map(([f, p]) => `
+        <div class="pcf-tcell"><span class="f">${f}</span><span class="eq">=</span><span class="p">${p}</span></div>`).join('')}
+      </div>
+    </div>`).join('');
+  pcfOverlay('📖 巧记百化分', `<div class="pcf-table">${body}</div>`);
+};
+
+const openPcfChallenge = () => {
+  const best = pcfBestLevel();
+  const body = `<div class="pcf-levels">${PCF_LEVELS.map((lv, i) => {
+    const n = i + 1, locked = n > best;
+    const own = i < 5 ? '4×4' : (i < 10 ? '4×6' : '6×6');
+    return `<button type="button" class="pcf-level${locked ? ' locked' : ''}" data-lv="${n}" ${locked ? 'disabled' : ''}>
+      <b>第 ${n} 关</b><span>${own} · ${fmtMS(lv.time)}</span>${locked ? '<i>🔒</i>' : ''}
+    </button>`;
+  }).join('')}</div>
+  <div class="muted" style="margin-top:.7em;font-size:.85em">闯关模式：每关提示 3 次，限时内消完全部配对即过关。</div>`;
+  pcfOverlay('🚩 闯关模式 · 选择关卡', body, (ov) => {
+    ov.querySelectorAll('.pcf-level:not(.locked)').forEach(b => b.addEventListener('click', () => {
+      startPcfGame('challenge', { level: parseInt(b.dataset.lv, 10) });
+    }));
+  });
+};
+
+const openPcfFreePicker = () => {
+  const body = `<div class="pcf-sizes">${PCF_FREE_SIZES.map(s => `
+    <button type="button" class="pcf-size" data-r="${s.rows}" data-c="${s.cols}">
+      <b>${s.rows} × ${s.cols}</b><span>${s.rows * s.cols} 格 · ${s.rows * s.cols / 2} 对</span>
+    </button>`).join('')}</div>
+  <div class="muted" style="margin-top:.7em;font-size:.85em">自由模式：不限时间，每局提示 5 次。</div>`;
+  pcfOverlay('🔲 自由模式 · 选择棋盘', body, (ov) => {
+    ov.querySelectorAll('.pcf-size').forEach(b => b.addEventListener('click', () => {
+      startPcfGame('free', { rows: +b.dataset.r, cols: +b.dataset.c });
+    }));
+  });
+};
+
+/* ---------- 开局 / 渲染 ---------- */
+const startPcfGame = (mode, opts = {}) => {
+  let rows, cols, timeLimit, hints;
+  if (mode === 'study') { rows = 4; cols = 5; timeLimit = 0; hints = Infinity; }
+  else if (mode === 'free') { rows = opts.rows || 4; cols = opts.cols || 5; timeLimit = 0; hints = PCF_FREE_HINTS; }
+  else {
+    const lv = PCF_LEVELS[Math.min(PCF_LEVELS.length, opts.level || 1) - 1];
+    rows = lv.rows; cols = lv.cols; timeLimit = lv.time; hints = PCF_CHALLENGE_HINTS;
+  }
+  const pairs = Math.floor(rows * cols / 2);
+  const chosen = shuffle(PCF_POOL.slice()).slice(0, Math.min(pairs, PCF_POOL.length));
+  const board = [];
+  chosen.forEach((c, i) => {
+    board.push({ pairId: i, kind: 'frac', text: c.frac, done: false, wrong: false, hint: false });
+    board.push({ pairId: i, kind: 'pct', text: c.pct, done: false, wrong: false, hint: false });
+  });
+  Object.assign(pcf, {
+    screen: 'game', mode, board: shuffle(board), sel: [], rows, cols,
+    matched: 0, totalPairs: chosen.length, hintsLeft: hints, elapsed: 0,
+    timeLimit, remain: timeLimit, paused: false, locked: false, level: opts.level || 1,
+  });
+  closePcfOverlay();
+  stopPcfTimer();
+  renderPcfGame();
+  resumePcfTimer();
+};
+
+const renderPcfGame = () => {
+  const root = $('#toolPercentRoot'); if (!root) return;
+  const modeName = { study: '📖 学习模式', challenge: '🚩 闯关模式', free: '🔲 自由模式' }[pcf.mode] || '';
+  root.innerHTML = `
+    <div class="pcf-game">
+      <div class="pcf-hud">
+        <span class="pcf-hud-mode">${modeName}</span>
+        <span class="pcf-hud-info" id="pcfHudInfo"></span>
+      </div>
+      <div class="pcf-topbar">
+        <button type="button" class="pcf-pause" id="pcfPause" title="暂停">⏸</button>
+        <div class="pcf-timer" id="pcfTimer">00:00</div>
+        <button type="button" class="pcf-exit" id="pcfExit" title="返回">✕</button>
+      </div>
+      <div class="pcf-board" id="pcfBoard" style="grid-template-columns:repeat(${pcf.cols},minmax(0,1fr))"></div>
+      <div class="pcf-bottombar">
+        <button type="button" class="pcf-tool" id="pcfHint"><span class="pcf-tool-ico">💡</span><span class="pcf-tool-txt">提示</span><i class="pcf-badge" id="pcfHintBadge"></i></button>
+        <button type="button" class="pcf-tool" id="pcfTableBtn"><span class="pcf-tool-ico">📖</span><span class="pcf-tool-txt">百化分表</span></button>
+      </div>
+    </div>`;
+  paintPcfBoard();
+  paintPcfTimer();
+  paintPcfHintBadge();
+  $('#pcfPause').addEventListener('click', pcfTogglePause);
+  $('#pcfExit').addEventListener('click', () => { stopPcfTimer(); pcf.screen = 'menu'; pcf.board = []; closePcfOverlay(); renderToolPercent(); });
+  $('#pcfHint').addEventListener('click', pcfHint);
+  $('#pcfTableBtn').addEventListener('click', openPcfTable);
+};
+
+const paintPcfTimer = () => {
+  const el = $('#pcfTimer'); if (!el) return;
+  if (pcf.timeLimit) { el.textContent = fmtMS(pcf.remain); el.classList.toggle('low', pcf.remain <= 15); }
+  else { el.textContent = fmtMS(pcf.elapsed); el.classList.remove('low'); }
+};
+const paintPcfHintBadge = () => {
+  const el = $('#pcfHintBadge'); if (!el) return;
+  if (pcf.hintsLeft === Infinity) { el.textContent = '∞'; el.classList.remove('zero'); }
+  else { el.textContent = String(Math.max(0, pcf.hintsLeft)); el.classList.toggle('zero', pcf.hintsLeft <= 0); }
+};
+const paintPcfBoard = () => {
+  const el = $('#pcfBoard'); if (!el) return;
+  el.innerHTML = pcf.board.map((t, i) => {
+    const cls = ['pcf-tile', t.kind === 'frac' ? 'frac' : 'pct'];
+    if (t.done) cls.push('done');
+    if (pcf.sel.includes(i)) cls.push('sel');
+    if (t.wrong) cls.push('wrong');
+    if (t.hint) cls.push('hint');
+    return `<button type="button" class="${cls.join(' ')}" data-i="${i}"${t.done ? ' disabled' : ''}>${escapeHtml(t.text)}</button>`;
+  }).join('');
+  el.querySelectorAll('.pcf-tile:not([disabled])').forEach(b => b.addEventListener('click', () => pcfTap(+b.dataset.i)));
+  const info = $('#pcfHudInfo');
+  if (info) info.textContent = pcf.mode === 'challenge'
+    ? `第 ${pcf.level} / ${PCF_LEVELS.length} 关 · 已完成 ${pcf.matched}/${pcf.totalPairs} 对`
+    : `已完成 ${pcf.matched} / ${pcf.totalPairs} 对`;
+};
+
+/* ---------- 交互 ---------- */
+const pcfTap = (i) => {
+  if (pcf.locked || pcf.paused || pcf.screen !== 'game') return;
+  const t = pcf.board[i];
+  if (!t || t.done) return;
+  if (pcf.sel.includes(i)) { pcf.sel = pcf.sel.filter(x => x !== i); paintPcfBoard(); return; }
+  pcf.sel.push(i);
+  paintPcfBoard();
+  if (pcf.sel.length < 2) return;
+  const a = pcf.sel[0], b = pcf.sel[1];
+  const ta = pcf.board[a], tb = pcf.board[b];
+  if (ta.pairId === tb.pairId && ta.kind !== tb.kind) {
+    ta.done = tb.done = true;
+    pcf.sel = [];
+    pcf.matched++;
+    paintPcfBoard();
+    if (pcf.matched === pcf.totalPairs) {
+      pcf.locked = true;
+      if (pcf.mode === 'challenge') pcfSaveBest(pcf.level + 1);
+      setTimeout(() => pcfResult(true), 340);
+    }
+  } else {
+    pcf.locked = true;
+    ta.wrong = tb.wrong = true;
+    paintPcfBoard();
+    setTimeout(() => {
+      ta.wrong = tb.wrong = false;
+      pcf.sel = [];
+      pcf.locked = false;
+      paintPcfBoard();
+    }, 480);
+  }
+};
+
+const pcfHint = () => {
+  if (pcf.paused || pcf.locked || pcf.screen !== 'game') return;
+  if (pcf.hintsLeft <= 0) { toast('本局提示次数已用完'); return; }
+  const byPair = {};
+  pcf.board.forEach((t, i) => { if (!t.done) (byPair[t.pairId] = byPair[t.pairId] || []).push(i); });
+  const key = Object.keys(byPair).find(k => byPair[k].length === 2);
+  if (key == null) return;
+  const idxs = byPair[key];
+  if (pcf.hintsLeft !== Infinity) pcf.hintsLeft--;
+  idxs.forEach(i => { pcf.board[i].hint = true; });
+  pcf.sel = [];
+  paintPcfBoard(); paintPcfHintBadge();
+  setTimeout(() => { idxs.forEach(i => { if (pcf.board[i]) pcf.board[i].hint = false; }); paintPcfBoard(); }, 1500);
+};
+
+const pcfTogglePause = () => {
+  if (pcf.screen !== 'game') return;
+  pcf.paused = true;
+  pcfOverlay('⏸ 已暂停', `<div class="pcf-paused">
+      <p class="muted">已用时 ${fmtMS(pcf.elapsed)}${pcf.timeLimit ? ' · 剩余 ' + fmtMS(pcf.remain) : ''}</p>
+      <div class="modal-actions">
+        <button type="button" class="primary-btn" id="pcfResume">继续</button>
+        <button type="button" class="ghost-btn" id="pcfQuit">退出本局</button>
+      </div>
+    </div>`, () => {
+    $('#pcfResume').addEventListener('click', () => { closePcfOverlay(); pcf.paused = false; });
+    $('#pcfQuit').addEventListener('click', () => { closePcfOverlay(); stopPcfTimer(); pcf.screen = 'menu'; pcf.board = []; renderToolPercent(); });
+  });
+};
+
+const pcfResult = (win) => {
+  stopPcfTimer();
+  pcf.locked = true;
+  const left = pcf.totalPairs - pcf.matched;
+  const title = win ? '🎉 全部消除！' : '⏰ 时间到';
+  const big = win ? `用时 ${fmtMS(pcf.elapsed)}` : `还剩 ${left} 对未消`;
+  const sub = pcf.mode === 'challenge'
+    ? `第 ${pcf.level} / ${PCF_LEVELS.length} 关 · 提示剩余 ${Math.max(0, pcf.hintsLeft)} 次`
+    : `提示剩余：${pcf.hintsLeft === Infinity ? '不限' : Math.max(0, pcf.hintsLeft)} 次`;
+  let actions;
+  if (win && pcf.mode === 'challenge' && pcf.level < PCF_LEVELS.length) {
+    actions = `<button type="button" class="primary-btn" id="pcfNextLv">下一关 →</button>
+               <button type="button" class="ghost-btn" id="pcfBackMenu">返回</button>`;
+  } else {
+    actions = `<button type="button" class="primary-btn" id="pcfReplay">再来一局</button>
+               <button type="button" class="ghost-btn" id="pcfBackMenu">返回</button>`;
+  }
+  pcfOverlay(title, `<div class="pcf-result">
+      <p class="pcf-result-big">${big}</p>
+      <p class="muted">${sub}</p>
+      <div class="modal-actions">${actions}</div>
+    </div>`, () => {
+    const nx = $('#pcfNextLv');
+    if (nx) nx.addEventListener('click', () => startPcfGame('challenge', { level: pcf.level + 1 }));
+    const rp = $('#pcfReplay');
+    if (rp) rp.addEventListener('click', () => startPcfGame(pcf.mode, { level: pcf.level, rows: pcf.rows, cols: pcf.cols }));
+    $('#pcfBackMenu').addEventListener('click', () => { closePcfOverlay(); pcf.screen = 'menu'; pcf.board = []; renderToolPercent(); });
+  });
+};
+
+/* ---------- 模式选择 ---------- */
 const renderToolPercent = () => {
   const root = $('#toolPercentRoot'); if (!root) return;
-  nextPercent();
-  root.innerHTML = `<div class="quiz-card">
-    <div class="quiz-stat">答对 <b id="tpScore">${toolPercent.score}</b> / <span id="tpTotal">${toolPercent.total}</span></div>
-    <div class="quiz-q" id="tpQ"></div>
-    <div class="quiz-opts" id="tpOpts"></div>
-    <div class="quiz-fb" id="tpFb"></div>
-    <div class="quiz-actions"><button class="primary-btn" id="tpNext">下一题 →</button></div>
-  </div>`;
-  paintPercent();
-  $('#tpNext').addEventListener('click', () => { nextPercent(); paintPercent(); $('#tpFb').textContent = ''; $('#tpFb').className = 'quiz-fb'; });
-};
-const paintPercent = () => {
-  $('#tpQ').textContent = `将 ${toolPercent.q} 化为百分数（保留一位小数）`;
-  const optsEl = $('#tpOpts');
-  optsEl.innerHTML = toolPercent.opts.map(o => `<button class="quiz-opt" data-v="${o}">${o}%</button>`).join('');
-  optsEl.dataset.done = '';
-  optsEl.querySelectorAll('.quiz-opt').forEach(b => {
-    b.addEventListener('click', () => {
-      if (optsEl.dataset.done) return;
-      optsEl.dataset.done = '1';
-      const v = parseFloat(b.dataset.v);
-      toolPercent.total++;
-      const ok = Math.abs(v - toolPercent.ans) < 1e-9;
-      if (ok) toolPercent.score++;
-      b.classList.add(ok ? 'correct' : 'wrong');
-      optsEl.querySelectorAll('.quiz-opt').forEach(x => { if (parseFloat(x.dataset.v) === toolPercent.ans) x.classList.add('correct'); });
-      $('#tpScore').textContent = toolPercent.score;
-      $('#tpTotal').textContent = toolPercent.total;
-      $('#tpFb').textContent = ok ? '✅ 正确！' : `❌ 正确答案：${toolPercent.ans}%`;
-      $('#tpFb').className = 'quiz-fb ' + (ok ? 'ok' : 'bad');
-    });
-  });
+  if (pcf.screen === 'game' && pcf.board.length) { renderPcfGame(); resumePcfTimer(); return; }
+  pcf.screen = 'menu';
+  const best = pcfBestLevel();
+  const cleared = Math.min(PCF_LEVELS.length, Math.max(0, pcfBestLevel() - 1));
+  root.innerHTML = `
+    <div class="pcf-modes">
+      <button type="button" class="pcf-mode-card orange" data-mode="study">
+        <span class="pcf-mode-ico">📖</span>
+        <span class="pcf-mode-txt"><b>学习模式</b><em>自由练习，提示次数不限，成绩不计入排行榜</em></span>
+      </button>
+      <button type="button" class="pcf-mode-card green" data-mode="challenge">
+        <span class="pcf-mode-ico">🚩</span>
+        <span class="pcf-mode-txt"><b>闯关模式</b><em>15 关 · 三种棋盘，限时挑战${cleared > 0 ? ` · 已通关 ${cleared} 关` : ''}</em></span>
+      </button>
+      <button type="button" class="pcf-mode-card blue" data-mode="free">
+        <span class="pcf-mode-ico">🔲</span>
+        <span class="pcf-mode-txt"><b>自由模式</b><em>自选格子数，不限时练习</em></span>
+      </button>
+      <div class="pcf-modes-foot">
+        <button type="button" class="pcf-table-link" id="pcfTableBtn2">📖 查看巧记百化分表</button>
+      </div>
+    </div>`;
+  root.querySelectorAll('.pcf-mode-card').forEach(b => b.addEventListener('click', () => {
+    const mode = b.dataset.mode;
+    if (mode === 'free') openPcfFreePicker();
+    else if (mode === 'challenge') openPcfChallenge();
+    else startPcfGame('study');
+  }));
+  $('#pcfTableBtn2').addEventListener('click', openPcfTable);
 };
 
 /* ---------- 2) 每日时政：标签筛选 + 收藏 ---------- */

@@ -310,6 +310,7 @@ body.nav-folded .reopen-btn { display: block; }
 }
 .primary-btn:hover { transform: translateY(-1px); filter: brightness(1.03); }
 .primary-btn:active { transform: translateY(0); }
+a.primary-btn { text-decoration: none; display: inline-flex; align-items: center; justify-content: center; line-height: 1.2; }
 .primary-btn.big { font-size: 1.05em; padding: 0.7em 1.8em; }
 .ghost-btn {
   background: var(--card);
@@ -1005,6 +1006,90 @@ textarea.text-input { border-radius: var(--radius-sm); resize: vertical; }
 .politics-date { font-size: 0.78em; color: #999; margin-left: 0.4em; }
 .politics-title { margin-top: 0.3em; line-height: 1.6; color: var(--text); }
 .politics-fav { background: none; border: none; font-size: 1.3em; cursor: pointer; line-height: 1; }
+
+/* ==================== 百分化游戏：三模式 ==================== */
+.pcf-modes { display: flex; flex-direction: column; gap: 1em; max-width: 32em; margin: 0 auto; }
+.pcf-mode-card {
+  position: relative; overflow: hidden; display: flex; align-items: center; gap: 1em;
+  width: 100%; border: none; cursor: pointer; text-align: left;
+  border-radius: 1.6em; padding: 1.15em 1.3em; color: #fff;
+  box-shadow: 0 10px 22px rgba(150, 120, 90, 0.18);
+  transition: transform .12s, filter .18s;
+}
+.pcf-mode-card::after { content: ''; position: absolute; right: -34px; top: -44px; width: 116px; height: 116px; border-radius: 50%; background: rgba(255,255,255,.16); }
+.pcf-mode-card:hover { transform: translateY(-2px); filter: brightness(1.04); }
+.pcf-mode-card:active { transform: translateY(0); }
+.pcf-mode-card.orange { background: linear-gradient(135deg, #FBC16B, #F0993E); }
+.pcf-mode-card.green  { background: linear-gradient(135deg, #9BD98B, #5FBB6A); }
+.pcf-mode-card.blue   { background: linear-gradient(135deg, #87BAE9, #5C97D6); }
+.pcf-mode-ico { flex: 0 0 auto; width: 2.7em; height: 2.7em; border-radius: 50%; background: rgba(255,255,255,.24); display: flex; align-items: center; justify-content: center; font-size: 1.15em; }
+.pcf-mode-txt { display: flex; flex-direction: column; gap: .15em; }
+.pcf-mode-txt b { font-size: 1.24em; font-weight: 800; letter-spacing: .02em; }
+.pcf-mode-txt em { font-style: normal; font-size: .82em; opacity: .93; line-height: 1.45; }
+.pcf-modes-foot { text-align: center; margin-top: .3em; }
+.pcf-table-link { background: var(--card); border: 1.5px solid var(--blue-border); color: var(--sky-deep); border-radius: 999px; padding: .55em 1.2em; font-weight: 700; cursor: pointer; font-size: .88em; }
+
+.pcf-game { max-width: 40em; margin: 0 auto; }
+.pcf-hud { display: flex; justify-content: space-between; align-items: center; gap: .6em; font-size: .8em; color: var(--muted); font-weight: 700; margin-bottom: .5em; padding: 0 .3em; }
+.pcf-hud-info { text-align: right; }
+.pcf-topbar { display: flex; align-items: center; gap: .7em; background: #4a4440; border-radius: 999px; padding: .5em .7em; margin-bottom: .8em; box-shadow: var(--shadow); }
+.pcf-pause, .pcf-exit { width: 2.4em; height: 2.4em; border-radius: 50%; border: none; background: rgba(255,255,255,.16); color: #fff; font-size: 1em; cursor: pointer; flex: 0 0 auto; }
+.pcf-pause:hover, .pcf-exit:hover { background: rgba(255,255,255,.28); }
+.pcf-timer { flex: 1; text-align: center; color: #fff; font-weight: 800; font-size: 1.9em; letter-spacing: .06em; font-variant-numeric: tabular-nums; }
+.pcf-timer.low { color: #ffb3a7; }
+
+.pcf-board { display: grid; gap: .45em; background: var(--card-2); padding: .6em; border-radius: 1.4em; box-shadow: inset 0 2px 8px rgba(150,120,90,.10); }
+.pcf-tile {
+  border: none; border-radius: .85em; padding: .6em .1em; font-weight: 800;
+  font-size: clamp(.6em, 2.5vw, .95em); color: #fff; cursor: pointer; min-height: 2.6em;
+  white-space: nowrap; overflow: hidden; font-variant-numeric: tabular-nums;
+  transition: transform .1s, opacity .25s, box-shadow .15s;
+}
+.pcf-tile.frac { background: linear-gradient(135deg, #5BA3E0, #3E7FC4); }
+.pcf-tile.pct  { background: linear-gradient(135deg, #68C77C, #3FA95A); }
+.pcf-tile:active { transform: scale(.94); }
+.pcf-tile.sel { box-shadow: 0 0 0 3px #ffd479, 0 0 14px rgba(255,190,80,.85); transform: translateY(-2px); }
+.pcf-tile.hint { box-shadow: 0 0 0 3px #fff2b0, 0 0 18px rgba(255,220,120,.95); }
+.pcf-tile.wrong { animation: pcfShake .45s; background: linear-gradient(135deg, #E8735E, #C9452F); }
+@keyframes pcfShake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(3px); } }
+.pcf-tile.done { opacity: .15; pointer-events: none; transform: scale(.88); }
+
+.pcf-bottombar { display: flex; gap: .8em; margin-top: 1em; }
+.pcf-tool { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; gap: .5em; background: var(--card); border: 1.5px solid var(--blue-border); border-radius: 1.2em; padding: .75em; cursor: pointer; font-weight: 800; color: var(--text-strong); box-shadow: var(--shadow-soft); transition: .15s; }
+.pcf-tool:hover { background: rgba(159,208,238,.16); }
+.pcf-tool-ico { font-size: 1.25em; }
+.pcf-badge { position: absolute; top: -.5em; right: 1.1em; min-width: 1.55em; height: 1.55em; border-radius: 999px; background: #F0993E; color: #fff; font-style: normal; font-size: .72em; font-weight: 800; display: flex; align-items: center; justify-content: center; padding: 0 .35em; }
+.pcf-badge.zero { background: #c9c0b6; }
+
+.pcf-overlay { position: fixed; inset: 0; background: rgba(74,63,53,.42); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 1em; }
+.pcf-sheet-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); width: 100%; max-width: 34em; max-height: 86vh; display: flex; flex-direction: column; overflow: hidden; }
+.pcf-sheet-head { display: flex; justify-content: space-between; align-items: center; gap: .6em; padding: 1em 1.2em; border-bottom: 1.5px solid var(--card-2); color: var(--text-strong); font-size: 1.05em; }
+.pcf-sheet-close { border: none; background: var(--card-2); border-radius: 50%; width: 2em; height: 2em; cursor: pointer; font-size: .9em; flex: 0 0 auto; }
+.pcf-sheet-body { padding: 1em 1.2em 1.4em; overflow: auto; }
+
+.pcf-table { display: flex; flex-direction: column; gap: 1em; }
+.pcf-tgroup { border-radius: 1.1em; padding: .8em .9em; }
+.pcf-tgroup.blue { background: #e3effb; }
+.pcf-tgroup.yellow { background: #fdf6d9; }
+.pcf-tgroup.green { background: #e6f6ea; }
+.pcf-tgroup.red { background: #fde6e4; }
+.pcf-tgroup-title { font-weight: 800; font-size: .82em; color: var(--text-strong); margin-bottom: .5em; }
+.pcf-tgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(6.4em, 1fr)); gap: .35em; }
+.pcf-tcell { background: rgba(255,255,255,.74); border-radius: .7em; padding: .35em .5em; display: flex; align-items: center; justify-content: center; gap: .25em; font-size: .85em; font-weight: 700; color: var(--text-strong); font-variant-numeric: tabular-nums; }
+.pcf-tcell .eq { color: var(--muted); font-weight: 400; }
+
+.pcf-levels { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.4em, 1fr)); gap: .6em; }
+.pcf-level { position: relative; display: flex; flex-direction: column; gap: .15em; align-items: center; background: var(--card-2); border: 1.5px solid var(--blue-border); border-radius: 1em; padding: .7em .5em; cursor: pointer; font-weight: 700; color: var(--text-strong); }
+.pcf-level span { font-size: .74em; color: var(--muted); font-weight: 600; }
+.pcf-level.locked { opacity: .5; cursor: not-allowed; }
+.pcf-level i { position: absolute; top: .3em; right: .5em; font-style: normal; font-size: .8em; }
+.pcf-sizes { display: grid; grid-template-columns: 1fr 1fr; gap: .7em; }
+.pcf-size { display: flex; flex-direction: column; gap: .2em; align-items: center; background: var(--card-2); border: 1.5px solid var(--blue-border); border-radius: 1.1em; padding: 1em .6em; cursor: pointer; font-weight: 800; color: var(--text-strong); }
+.pcf-size span { font-size: .74em; color: var(--muted); font-weight: 600; }
+.pcf-result { text-align: center; }
+.pcf-result-big { font-size: 1.2em; font-weight: 800; color: var(--text-strong); margin: .2em 0 .3em; }
+.pcf-paused { display: flex; flex-direction: column; gap: .7em; align-items: center; text-align: center; }
+.pcf-result .modal-actions, .pcf-paused .modal-actions { display: flex; gap: .7em; justify-content: center; margin-top: .8em; flex-wrap: wrap; }
 .tg-会议 { background: #ffd6a5; color: #a35a00; }
 .tg-科技 { background: #cfe3ff; color: #2a5db0; }
 .tg-民生 { background: #d9f5e3; color: #2e7d5b; }
