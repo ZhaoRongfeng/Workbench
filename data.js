@@ -973,6 +973,291 @@ const DEFAULT_EXAM_INFO = [
       { label: '职位简章', url: 'http://www.hnrsks.com/' },
     ],
   },
+{
+  "id": "info-tj-4a45673f7e9e4842aad1ba09ef0824e7-227038",
+  "title": "辽宁选调宣讲会",
+  "category": "辽宁",
+  "subcategory": "宣讲会",
+  "date": "2026-09-09",
+  "content": "辽宁省选调生宣讲会 宣讲会信息。",
+  "links": [
+    {
+      "label": "同济原文",
+      "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=4a45673f7e9e4842aad1ba09ef0824e7"
+    }
+  ],
+  "talk": {
+    "title": "辽宁省选调生宣讲会",
+    "time": "2026年9月16日，15:30",
+    "location": "四平路校"
+  }
+},
+{
+  "id": "info-tj-0227f97377b4479d8e6e0b8d7a7cf3ea",
+  "title": "2027届选调生公告汇总",
+  "category": "其他",
+  "subcategory": "选调",
+  "date": "2026-09-09",
+  "content": "2027届选调生公告汇总【华东】1.上海（1）上海市2027年度选调应届优秀大学毕业生公告（9月8日",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=0227f97377b4479d8e6e0b8d7a7cf3ea"
+    }
+  ]
+},
+{
+  "id": "info-tj-c2a334d33342465e814ad02252a6db0b",
+  "title": "【湖北选调】湖北省面向同济大学定向选调（选聘）2027届优秀大学毕业生公告",
+  "category": "湖北",
+  "subcategory": "选调",
+  "date": "2026-09-10",
+  "content": "﻿湖北省面向同济大学定向选调（选聘）2027届优秀大学毕业生公告为进一步加强湖北省干部队伍优质源头建",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=c2a334d33342465e814ad02252a6db0b"
+    }
+  ]
+},
+{
+  "id": "info-tj-dc00d0fdfad54f25aa532e4d25267164",
+  "title": "【上海选调】上海市2027年度选调应届优秀大学毕业生公告",
+  "category": "上海",
+  "subcategory": "选调",
+  "date": "2026-09-09",
+  "content": "﻿上海市2027年度选调应届优秀大学毕业生公告为进一步加强上海高素质专业化干部队伍建设，现决定在部分",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=dc00d0fdfad54f25aa532e4d25267164"
+    }
+  ]
+},
+{
+  "id": "info-tj-c881733dab844859919edd7d6865a4db",
+  "title": "【浙江杭州】某中直机关在杭单位2027年国家公务员招考报名",
+  "category": "浙江",
+  "subcategory": "公务员",
+  "date": "2026-09-08",
+  "content": "要求：1、政治立场坚定，学习成绩优良，未受过任何处分。2.中共党员（含预备党员）。3.专业不限。4.",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=c881733dab844859919edd7d6865a4db"
+    }
+  ]
+},
+{
+  "id": "info-tj-36652b5c62c5497ca3fc0f3d9c1fc82a",
+  "title": "暑期参访 | 上海市虹口区2026年 “潮涌浦江·虹菁启航”优秀应届毕业生 暑期研学营公告",
+  "category": "上海",
+  "subcategory": "公告",
+  "date": "2026-06-01",
+  "content": "为进一步扩大选调生招录覆盖面，搭建青年人才与虹口区互动交流平台，中共虹口区委组织部计划于2026年6",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=36652b5c62c5497ca3fc0f3d9c1fc82a"
+    }
+  ]
+},
+{
+  "id": "info-tj-f0134e7901fe47f99cd0920b96558ab9",
+  "title": "事业编！（杭州市）钱塘发布2026年紧缺岗位人才招聘公告",
+  "category": "其他",
+  "subcategory": "公告",
+  "date": "2026-04-08",
+  "content": "事业编！（杭州市）钱塘发布2026年紧缺岗位人才招聘公告，来源：同济大学学生就业指导中心。",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://mp.weixin.qq.com/s/jHNaOw2mt7MDtetqxPStqA"
+    }
+  ]
+},
+{
+  "id": "info-tj-e82533df1f3e4717a2b9641862940ac2",
+  "title": "安徽省各地市在2026年度定向招录选调生中同步开展人才引进公告汇总",
+  "category": "安徽",
+  "subcategory": "选调",
+  "date": "2026-04-07",
+  "content": "安徽省各地市在2026年度定向招录选调生中同步开展人才引进公告汇总 1.合肥市关于在安徽省2026年度定向招录选调生中同步开展人才引进的公告https://bm.gd-pa.cn/wsbm/unit-notice?batchId=2032700236671168514&fcode=hfks&sessionid= 2.淮北市在2026年度定向选调生招录中同步开展党",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=e82533df1f3e4717a2b9641862940ac2"
+    }
+  ]
+},
+{
+  "id": "info-tj-3b7e4e10f01a47669ae7eab06c7f88cb",
+  "title": "青岛西海岸新区2026年事业单位集中引才公告",
+  "category": "其他",
+  "subcategory": "事业单位",
+  "date": "2026-04-03",
+  "content": "﻿body{font-family:'TimesNewRoman';font-size:1em;}ul,ol{margin-top:0;margin-bottom:0;}.Normal{text-align:justify;page-break-inside:auto;page-break-after:auto;page-break-before:auto;margin-top:0.0pt;mar",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=3b7e4e10f01a47669ae7eab06c7f88cb"
+    }
+  ]
+},
+{
+  "id": "info-tj-d412c5fe1ffb439f9e325c94a327767a",
+  "title": "大理州2026年高层次专业化“霞光人才”引进公告",
+  "category": "其他",
+  "subcategory": "公告",
+  "date": "2026-03-30",
+  "content": "大理州2026年高层次专业化“霞光人才”引进公告，来源：同济大学学生就业指导中心。",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://mp.weixin.qq.com/s/SJOIFIbw6a4gBIxfwn9oNQ"
+    }
+  ]
+},
+{
+  "id": "info-tj-5bfc27b8379f4ee980735d8769d6d782",
+  "title": "【海南选调】海南省2026年度选调应届优秀大学毕业生招录笔试考前公告",
+  "category": "其他",
+  "subcategory": "选调",
+  "date": "2026-03-25",
+  "content": "海南省2026年度选调应届优秀大学毕业生招录笔试定于3月29日举行。具体要求详见海南省考试局网站 海南航空公司亦为参加本次选调的考生提供了专属出行福利",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=5bfc27b8379f4ee980735d8769d6d782"
+    }
+  ]
+},
+{
+  "id": "info-tj-19c40877653c48dca60d56221838aff2",
+  "title": "西藏自治区林芝市2026年度引进急需紧缺人才公告",
+  "category": "其他",
+  "subcategory": "公告",
+  "date": "2026-03-18",
+  "content": "西藏自治区林芝市2026年度引进急需紧缺人才公告 为深入实施人才强市战略，吸引更多优秀人才来林工作，根据《西藏自治区高层次和急需紧缺人才引进办法》等有关规定，现就西藏自治区林芝市2026年引进急需紧缺人才公告如下。一、引进条件（一）基本条件1.具有中华人民共和国国籍；2.年满十八周岁，年龄不超过35周岁（1991年7月1日以后出生）；3.政治立场坚定，具有良好的政治素质和道德品行；4.遵",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=19c40877653c48dca60d56221838aff2"
+    }
+  ]
+},
+{
+  "id": "info-tj-0cfd533b92d144b88d5d765bcd0f2c80",
+  "title": "中央宣传部直属单位拟公开招聘60名工作人员",
+  "category": "其他",
+  "subcategory": "公告",
+  "date": "2026-03-13",
+  "content": "中央宣传部直属单位拟公开招聘60名工作人员，来源：同济大学学生就业指导中心。",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://mp.weixin.qq.com/s/xAfj2DipdHKXULrpEoOi7Q"
+    }
+  ]
+},
+{
+  "id": "info-tj-7e82d733e08c423b97f48ae576552cd7",
+  "title": "2026年度青岛市专项招录公务员公告",
+  "category": "其他",
+  "subcategory": "公务员",
+  "date": "2026-03-10",
+  "content": "﻿body{font-family:'TimesNewRoman';font-size:1em;}ul,ol{margin-top:0;margin-bottom:0;}.Normal{text-align:justify;page-break-inside:auto;page-break-after:auto;page-break-before:auto;margin-top:0.0pt;mar",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=7e82d733e08c423b97f48ae576552cd7"
+    }
+  ]
+},
+{
+  "id": "info-tj-0c041ba65d8a448a8b8f73d3aff14b39",
+  "title": "【重庆选调】重庆市集中选调2026届应届优秀大学毕业生到基层工作简章",
+  "category": "重庆",
+  "subcategory": "选调",
+  "date": "2026-02-28",
+  "content": "【校内推荐流程】1.填写打印《报名推荐表》后，先到院系党委审核盖章；2.院系党委盖章后，登陆学生就业信息网—职业发展报名，将《报名推荐表》上传；3.3月8日16:00前，凭短信在工作时间段到四平路校区大学生活动中心（山南楼）216室或嘉定校区F楼1楼事务大厅学生就业指导中心盖章；4.校内推荐问题请咨询肖老师，65980046。 公告链接：https://www.1",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=0c041ba65d8a448a8b8f73d3aff14b39"
+    }
+  ]
+},
+{
+  "id": "info-tj-29aa7dd016d3412b9012b40600189213",
+  "title": "公安部大数据中心2026年度公开招聘公告",
+  "category": "其他",
+  "subcategory": "公告",
+  "date": "2026-02-10",
+  "content": "﻿body{font-family:'TimesNewRoman';font-size:1em;}p{padding:0;margin-top:3pt;margin-right:0;margin-bottom:3pt;margin-left:0;}ul,ol{margin-top:0;margin-bottom:0;}.Default-Paragraph-Font{color:#333333;fo",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=29aa7dd016d3412b9012b40600189213"
+    }
+  ]
+},
+{
+  "id": "info-tj-e787c546adbe49a0859eaca85232feae",
+  "title": "【海南选调】海南省2026年度选调应届优秀大学毕业生公告",
+  "category": "其他",
+  "subcategory": "选调",
+  "date": "2026-01-26",
+  "content": "【校内推荐流程】1、系统填写相关信息，下载打印《报名推荐表》，先到院系党委审核盖章；2、院系党委盖章后，登陆学生就业信息网-学生求职报名版块-2026海南选调生项目，核对本人联系信息并将《报名推荐表》（PDF版）上传；3、1月30日17：00前，携带院系党委盖章的《报名推荐表》在寒假值班工作时间段到四平路校区经纬楼101（如通过短信暂未收到，也可直接前往盖章）；4、学校盖章后，请本人妥善保管《报名",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=e787c546adbe49a0859eaca85232feae"
+    }
+  ]
+},
+{
+  "id": "info-tj-b943c38bdab843baab8de07e8abcec36",
+  "title": "【湖北选调】2026年湖北省普通选调生招录公告",
+  "category": "湖北",
+  "subcategory": "选调",
+  "date": "2026-01-14",
+  "content": "﻿body{font-family:'TimesNewRoman';font-size:1em;}ul,ol{margin-top:0;margin-bottom:0;}.Normal{text-align:justify;page-break-inside:auto;page-break-after:auto;page-break-before:auto;margin-top:0.0pt;mar",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=b943c38bdab843baab8de07e8abcec36"
+    }
+  ]
+},
+{
+  "id": "info-tj-97713cdb4e874259992e8d024f7cafbb",
+  "title": "2026年烟台市青年干部人才“菁英计划” 选聘公告",
+  "category": "其他",
+  "subcategory": "公告",
+  "date": "2026-01-14",
+  "content": "﻿body{font-family:'TimesNewRoman';font-size:1em;}ul,ol{margin-top:0;margin-bottom:0;}.Normal{text-align:justify;page-break-inside:auto;page-break-after:auto;page-break-before:auto;margin-top:0.0pt;mar",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=97713cdb4e874259992e8d024f7cafbb"
+    }
+  ]
+},
+{
+  "id": "info-tj-9ac78a4e9d8444b4b7275c56ca67fbf1",
+  "title": "公开招聘丨全部带编，深圳南山招聘教师123人！",
+  "category": "其他",
+  "subcategory": "公告",
+  "date": "2026-01-04",
+  "content": "公开招聘丨全部带编，深圳南山招聘教师123人！，来源：同济大学学生就业指导中心。",
+  "links": [
+    {
+      "label": "原文链接",
+      "url": "https://mp.weixin.qq.com/s/w3nDrqEP3kCmiCjVDtZ53Q"
+    }
+  ]
+}
 ];
 
 /* ====================================================================
