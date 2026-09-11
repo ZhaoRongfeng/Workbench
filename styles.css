@@ -817,6 +817,89 @@ textarea.text-input { border-radius: var(--radius-sm); resize: vertical; }
 .exam-reg-tip { font-size: 0.78em; color: #d98a3c; margin-top: 0.2em; }
 
 /* ====================================================================
+ * v3.0 新增：考试倒计时卡片（编辑 + 详情）
+ * ==================================================================== */
+.exam-list { display: flex; flex-direction: column; gap: 0.8em; }
+.exam-card {
+  background: linear-gradient(135deg, #e7f3fb, #e0f0f8);
+  border: 1.5px solid var(--blue-border);
+  border-radius: var(--radius);
+  padding: 1em 1.2em;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: var(--shadow-soft);
+}
+.exam-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.exam-card.urgent { background: linear-gradient(135deg, #ffe9e3, #fff0ec); border-color: var(--coral); }
+.exam-card.passed { opacity: 0.75; filter: grayscale(0.25); }
+.exam-card-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.6em; margin-bottom: 0.6em;
+}
+.exam-card-title { font-weight: 800; color: var(--text-strong); font-size: 1.05em; }
+.exam-card-actions { display: flex; gap: 0.4em; flex-shrink: 0; }
+.exam-card-main {
+  display: flex; align-items: center; gap: 1em;
+}
+.exam-card-days {
+  font-size: 2.8em; font-weight: 900; color: var(--sky-deep);
+  min-width: 2.2em; text-align: center; line-height: 1;
+}
+.exam-card.urgent .exam-card-days { color: var(--coral-deep); }
+.exam-card-unit {
+  display: block; font-size: 0.28em; font-weight: 700; color: var(--text); margin-top: 0.2em;
+}
+.exam-card-meta { flex: 1; }
+.exam-card-date, .exam-card-reg { font-size: 0.85em; color: var(--muted); }
+
+/* 考试详情弹窗 */
+.exam-detail-card { width: 26em; max-width: 92vw; }
+.exam-detail-header {
+  background: linear-gradient(135deg, #a9d6ef, #b6ecd6);
+  border-radius: var(--radius);
+  padding: 1.4em 1.2em;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 1em;
+}
+.exam-detail-title { font-size: 1.25em; font-weight: 800; margin-bottom: 0.4em; }
+.exam-detail-status { font-size: 2.6em; font-weight: 900; line-height: 1; margin-bottom: 0.3em; }
+.exam-detail-date { font-size: 0.9em; opacity: 0.95; }
+.exam-detail-body { display: flex; flex-direction: column; gap: 0.7em; margin-bottom: 1em; }
+.exam-detail-row {
+  background: var(--card-2);
+  border-radius: var(--radius-sm);
+  padding: 0.7em 0.9em;
+  display: flex; flex-direction: column; gap: 0.25em;
+}
+.exam-detail-label { font-size: 0.78em; color: var(--muted); font-weight: 700; }
+.exam-detail-val { font-size: 0.95em; color: var(--text-strong); font-weight: 700; }
+.exam-detail-link {
+  color: var(--sky-deep); font-weight: 700; word-break: break-all; text-decoration: none;
+}
+.exam-detail-subjects { display: flex; flex-direction: column; gap: 0.4em; }
+.exam-subject-item {
+  display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;
+}
+.exam-subject-name { font-weight: 700; color: var(--text-strong); }
+.exam-subject-tag {
+  background: var(--sky); color: #fff; font-size: 0.78em; font-weight: 700;
+  padding: 0.15em 0.6em; border-radius: 999px;
+}
+.exam-subject-tag.time { background: var(--mint-deep); }
+
+/* 考试编辑弹窗 */
+.exam-edit-card { width: 26em; max-width: 92vw; }
+.exam-subject-list { display: flex; flex-direction: column; gap: 0.45em; margin-top: 0.4em; }
+.exam-subject-input { display: flex; gap: 0.4em; align-items: center; }
+.exam-subject-input .text-input { flex: 1; min-width: 0; font-size: 0.85em; padding: 0.45em 0.7em; }
+.exam-subject-input .sub-del { flex-shrink: 0; padding: 0.2em 0.5em; }
+
+@media (max-width: 560px) {
+  .exam-card-main { flex-direction: column; align-items: flex-start; gap: 0.4em; }
+  .exam-card-days { font-size: 2.2em; }
+}
+
+/* ====================================================================
  * v2.9 新增：编辑资料弹窗里的头像区（手机端侧栏选图不可用时的替代路径）
  * ==================================================================== */
 .avatar-edit { display: flex; align-items: center; gap: 1em; flex-wrap: wrap; }
@@ -839,3 +922,83 @@ textarea.text-input { border-radius: var(--radius-sm); resize: vertical; }
 }
 .avatar-preset:hover { transform: scale(1.12); box-shadow: var(--shadow-soft); }
 .tiny { font-size: 0.75em; }
+
+/* ====================================================================
+ * v3.0 新增：考试汇总板块
+ * ==================================================================== */
+.exam-info-toolbar { padding-bottom: 0.8em; }
+.exam-info-search-row { display: flex; gap: 0.6em; margin-bottom: 0.8em; }
+.exam-info-search-row .text-input { flex: 1; }
+.exam-info-chips, .exam-info-sub-chips {
+  display: flex; flex-wrap: wrap; gap: 0.45em;
+  margin-bottom: 0.6em;
+}
+.exam-info-sub-chips { margin-left: 0.2em; }
+.info-chip {
+  background: #fff0f3;
+  border: 1.5px solid #ffd6df;
+  color: #a6546a;
+  border-radius: 999px;
+  padding: 0.35em 0.9em;
+  font-size: 0.85em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.info-chip:hover { background: #ffe4ea; }
+.info-chip.active {
+  background: linear-gradient(135deg, #ff9eb4, #ffc2d1);
+  border-color: #ff9eb4;
+  color: #fff;
+}
+.info-chip.sub { background: #f7f7f7; border-color: #e0d8cf; color: var(--text); }
+.info-chip.sub:hover { background: #efe9e0; }
+.info-chip.sub.active { background: var(--sky); border-color: var(--sky-deep); color: #fff; }
+.exam-info-actions { display: flex; gap: 0.5em; }
+.exam-info-list { display: flex; flex-direction: column; gap: 0.9em; }
+.info-card {
+  background: linear-gradient(135deg, #fff5f7, #ffeff2);
+  border: 1.5px solid #ffd6df;
+  border-radius: var(--radius);
+  padding: 1em 1.2em;
+  box-shadow: var(--shadow-soft);
+}
+.info-card-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5em; margin-bottom: 0.5em; }
+.info-card-title { font-weight: 800; color: var(--text-strong); font-size: 1.05em; flex: 1; }
+.info-card-tags { display: flex; gap: 0.35em; flex-wrap: wrap; }
+.info-tag {
+  border-radius: 999px;
+  padding: 0.15em 0.6em;
+  font-size: 0.75em;
+  font-weight: 700;
+}
+.info-tag.cat { background: #ff9eb4; color: #fff; }
+.info-tag.sub { background: #ffe4ea; color: #a6546a; }
+.info-tag.date { background: #f0e7da; color: var(--text); }
+.info-card-body { font-size: 0.9em; line-height: 1.7; color: var(--text); margin-bottom: 0.6em; }
+.info-card-links { display: flex; flex-wrap: wrap; gap: 0.4em; margin-bottom: 0.6em; }
+.info-link {
+  display: inline-flex; align-items: center;
+  background: #fff; border: 1.5px solid #ffd6df;
+  color: #c35f7a; border-radius: 999px;
+  padding: 0.25em 0.8em; font-size: 0.82em; font-weight: 700; text-decoration: none;
+}
+.info-link:hover { background: #ffd6df; color: #8c3b52; }
+.info-talk-card {
+  background: #fff; border: 1.5px dashed #ffb3c5;
+  border-radius: var(--radius-sm);
+  padding: 0.7em 0.9em;
+  margin-bottom: 0.6em;
+}
+.info-talk-title { font-weight: 800; color: #a6546a; font-size: 0.95em; margin-bottom: 0.25em; }
+.info-talk-row { font-size: 0.85em; color: var(--text); }
+.info-card-actions { display: flex; gap: 0.4em; }
+
+/* 考试信息编辑弹窗 */
+.exam-info-edit-card { width: 26em; max-width: 92vw; }
+.exam-info-link-list { display: flex; flex-direction: column; gap: 0.45em; margin-top: 0.4em; }
+.exam-info-link-input { display: flex; gap: 0.4em; align-items: center; }
+.exam-info-link-input .text-input { flex: 1; min-width: 0; font-size: 0.85em; padding: 0.45em 0.7em; }
+.exam-info-link-input .link-del { flex-shrink: 0; padding: 0.2em 0.5em; }
+.exam-info-talk-fields { display: flex; flex-direction: column; gap: 0.6em; }
+.exam-info-talk-fields .modal-row { margin-bottom: 0; }

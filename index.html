@@ -106,6 +106,13 @@
             <span class="nav-icon" data-page-node-id="0pAaVWtFvF1rZBRjoVKex0">🗂️</span><span class="nav-label" data-page-node-id="G8KzPob8eesHNcsksp0KCl">错题汇总</span>
           </a>
         </div>
+
+        <div class="nav-group" data-page-node-id="toolGroupNode">
+          <div class="nav-group-title" data-page-node-id="toolGroupTitle">🧰 工具合集</div>
+          <a class="nav-item" data-route="exam-info" data-page-node-id="examInfoNavItem">
+            <span class="nav-icon" data-page-node-id="examInfoNavIcon">📰</span><span class="nav-label" data-page-node-id="examInfoNavLabel">考试汇总</span>
+          </a>
+        </div>
       </nav>
 
       <!-- 底部：设置 + 数据 -->
@@ -650,6 +657,30 @@
         </div>
       </section>
 
+      <!-- 考试汇总 -->
+      <section class="view" data-view="exam-info" data-page-node-id="examInfoView">
+        <div class="view-header" data-page-node-id="examInfoHeader">
+          <h2 data-page-node-id="examInfoTitle">📰 考试汇总</h2>
+          <p class="muted" data-page-node-id="examInfoDesc">公告、职位简章、宣讲会信息一站式查看</p>
+        </div>
+
+        <div class="card exam-info-toolbar" data-page-node-id="examInfoToolbar">
+          <div class="exam-info-search-row" data-page-node-id="examInfoSearchRow">
+            <input type="text" id="examInfoSearch" class="text-input" placeholder="搜索公告标题、地区、关键词...">
+            <button class="primary-btn" id="addExamInfoBtn">＋ 添加</button>
+          </div>
+          <div class="exam-info-chips" id="examInfoChips" data-page-node-id="examInfoChips"></div>
+          <div class="exam-info-sub-chips" id="examInfoSubChips" data-page-node-id="examInfoSubChips"></div>
+          <div class="exam-info-actions" data-page-node-id="examInfoActions">
+            <button class="ghost-btn small" id="exportExamInfoBtn">💾 导出 JSON</button>
+            <button class="ghost-btn small" id="importExamInfoBtn">📥 导入 JSON</button>
+            <input type="file" id="importExamInfoFile" accept=".json" hidden>
+          </div>
+        </div>
+
+        <div class="exam-info-list" id="examInfoList" data-page-node-id="examInfoList"></div>
+      </section>
+
       <!-- 欢迎页 -->
       <section class="view active" data-view="home" data-page-node-id="AUX7RPz0fHQGkWvh6w4RcK">
         <div class="welcome" data-page-node-id="zukLURtAiATgxHjOxbNLM5">
@@ -780,6 +811,129 @@
       <div class="modal-actions" data-page-node-id="Z99ZA99sRkHl0H1pkHt5q8">
         <button class="ghost-btn" id="noteCancel" data-page-node-id="AN9nM3LMUmXR2kCDqMf6mm">取消</button>
         <button class="primary-btn" id="noteSave" data-page-node-id="WflQ4Sef7jYJ7EtYdMYZ60">保存笔记</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 考试详情弹窗 -->
+  <div class="modal" id="examDetailModal" hidden>
+    <div class="modal-card exam-detail-card">
+      <div class="exam-detail-header">
+        <div class="exam-detail-title" id="detailExamName">国考笔试</div>
+        <div class="exam-detail-status" id="detailExamStatus">94 天后开考</div>
+        <div class="exam-detail-date" id="detailExamDate">2026年11月30日</div>
+      </div>
+      <div class="exam-detail-body">
+        <div class="exam-detail-row">
+          <span class="exam-detail-label">⏰ 报名时间</span>
+          <span class="exam-detail-val" id="detailExamReg">2026-10-15（还剩 34 天）</span>
+        </div>
+        <div class="exam-detail-row">
+          <span class="exam-detail-label">🔗 报名官网</span>
+          <a class="exam-detail-link" id="detailExamUrl" href="#" target="_blank" rel="noopener">https://bm.scs.gov.cn/</a>
+        </div>
+        <div class="exam-detail-row">
+          <span class="exam-detail-label">📝 笔试科目</span>
+          <div class="exam-detail-subjects" id="detailExamSubjects"></div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="ghost-btn" id="detailExamEdit">✏️ 编辑</button>
+        <button class="danger-btn" id="detailExamDelete">删除</button>
+        <button class="primary-btn" id="detailExamClose">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 考试添加/编辑弹窗 -->
+  <div class="modal" id="examEditModal" hidden>
+    <div class="modal-card exam-edit-card">
+      <div class="modal-title" id="examEditTitle">添加考试</div>
+      <div class="modal-row">
+        <label>考试名称</label>
+        <input type="text" id="examEditName" class="text-input" placeholder="如：国考笔试 / 湖北省选调">
+      </div>
+      <div class="modal-row">
+        <label>考试日期</label>
+        <input type="date" id="examEditDate" class="text-input">
+      </div>
+      <div class="modal-row">
+        <label>报名日期</label>
+        <input type="date" id="examEditRegDate" class="text-input">
+      </div>
+      <div class="modal-row">
+        <label>报名官网</label>
+        <input type="text" id="examEditUrl" class="text-input" placeholder="https://...">
+      </div>
+      <div class="modal-row">
+        <label>类别</label>
+        <select id="examEditType" class="select-input">
+          <option value="国考">国考</option>
+          <option value="省考">省考</option>
+          <option value="选调">选调</option>
+          <option value="市考">市考</option>
+          <option value="其他">其他</option>
+        </select>
+      </div>
+      <div class="modal-row">
+        <label>笔试科目 <button type="button" class="ghost-btn small" id="examAddSubjectBtn">＋ 添加科目</button></label>
+        <div class="exam-subject-list" id="examSubjectList"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="ghost-btn" id="examEditCancel">取消</button>
+        <button class="primary-btn" id="examEditSave">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 考试信息添加/编辑弹窗 -->
+  <div class="modal" id="examInfoEditModal" hidden>
+    <div class="modal-card exam-info-edit-card">
+      <div class="modal-title" id="examInfoEditTitle">添加考试信息</div>
+      <div class="modal-row">
+        <label>标题</label>
+        <input type="text" id="examInfoEditTitleInput" class="text-input" placeholder="如：2026上海市选调公告">
+      </div>
+      <div class="modal-row">
+        <label>地区 / 大类</label>
+        <input type="text" id="examInfoEditCategory" class="text-input" placeholder="如：上海、国考、湖北">
+      </div>
+      <div class="modal-row">
+        <label>二级分类</label>
+        <input type="text" id="examInfoEditSubcategory" class="text-input" placeholder="如：选调、市考、省考">
+      </div>
+      <div class="modal-row">
+        <label>公告日期</label>
+        <input type="date" id="examInfoEditDate" class="text-input">
+      </div>
+      <div class="modal-row">
+        <label>内容摘要</label>
+        <textarea id="examInfoEditContent" class="text-input" rows="3" placeholder="公告要点、报名条件、笔试时间等..."></textarea>
+      </div>
+      <div class="modal-row">
+        <label>相关链接 <button type="button" class="ghost-btn small" id="examInfoAddLinkBtn">＋ 添加链接</button></label>
+        <div class="exam-info-link-list" id="examInfoLinkList"></div>
+      </div>
+      <div class="modal-row">
+        <label><input type="checkbox" id="examInfoHasTalk"> 包含宣讲会</label>
+      </div>
+      <div class="exam-info-talk-fields" id="examInfoTalkFields" hidden>
+        <div class="modal-row">
+          <label>宣讲会标题</label>
+          <input type="text" id="examInfoTalkTitle" class="text-input" placeholder="如：上海选调省宣讲会">
+        </div>
+        <div class="modal-row">
+          <label>宣讲时间</label>
+          <input type="text" id="examInfoTalkTime" class="text-input" placeholder="如：2026年9月15日 15:00">
+        </div>
+        <div class="modal-row">
+          <label>宣讲地点</label>
+          <input type="text" id="examInfoTalkLocation" class="text-input" placeholder="如：四平路校区中法中心C301">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="ghost-btn" id="examInfoEditCancel">取消</button>
+        <button class="primary-btn" id="examInfoEditSave">保存</button>
       </div>
     </div>
   </div>

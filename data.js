@@ -880,8 +880,99 @@ const MODEL_ESSAYS = [
 ];
 
 // 默认考试（用户可手动增删）
+// 字段：id, name, date(考试日期), regDate(报名日期), url(官网),
+//       type(类别：国考/省考/选调/市考), subjects[{name,duration,timeRange}]
 const DEFAULT_EXAMS = [
-  { id: 'exam-default-1', name: '国考笔试', date: '2026-11-30', regDate: '2026-10-15', url: 'https://bm.scs.gov.cn/' },
+  {
+    id: 'exam-default-1',
+    name: '国考笔试',
+    date: '2026-11-30',
+    regDate: '2026-10-15',
+    url: 'https://bm.scs.gov.cn/',
+    type: '国考',
+    subjects: [
+      { name: '行政职业能力测验', duration: '120分钟', timeRange: '9:00-11:00' },
+      { name: '申论', duration: '180分钟', timeRange: '14:00-17:00' },
+    ]
+  },
+];
+
+// 默认考试信息（考试汇总板块）
+// category: 用于顶部筛选（国考/省考/选调/河南/上海/湖北...）
+// subcategory: 二级标签（选调/市考/省考...）
+// links: [{label,url}] 公告正文、职位简章等
+// talk: { title, time, location } 宣讲会信息（可选）
+const DEFAULT_EXAM_INFO = [
+  {
+    id: 'info-guokao-2026',
+    title: '2026年度国考公告',
+    category: '国考',
+    subcategory: '国考',
+    date: '2026-10-14',
+    content: '中央机关及其直属机构2026年度考试录用公务员公告。报名时间为2026年10月15日8:00至10月24日18:00，公共科目笔试时间为2026年11月30日。',
+    links: [
+      { label: '公告原文', url: 'https://bm.scs.gov.cn/' },
+      { label: '职位简章', url: 'https://bm.scs.gov.cn/' },
+    ],
+  },
+  {
+    id: 'info-shanghai-xuandiao-2026',
+    title: '2026上海市选调公告',
+    category: '上海',
+    subcategory: '选调',
+    date: '2026-09-10',
+    content: '上海市2026年度选调应届优秀大学毕业生公告。面向部分高校选调应届优秀大学毕业生，考生可同时选择报考专项选调或定向选调职位。',
+    links: [
+      { label: '公告原文', url: 'https://shacs.gov.cn/recruits/434/article/1351?n=%E5%85%AC%E5%91%8A' },
+      { label: '职位简章', url: 'https://shacs.gov.cn/recruits/434/article/1354?n=%E5%85%AC%E5%91%8A' },
+    ],
+    talk: {
+      title: '上海选调省宣讲会',
+      time: '2026年9月15日 15:00',
+      location: '四平路校区中法中心C301',
+    },
+  },
+  {
+    id: 'info-shanghai-shikao-2026',
+    title: '2026上海市考公告',
+    category: '上海',
+    subcategory: '市考',
+    date: '2026-11-05',
+    content: '上海市2026年度考试录用公务员公告。笔试科目为《行政职业能力测验》和《申论》，部分岗位加试专业科目。',
+    links: [
+      { label: '公告原文', url: 'https://shacs.gov.cn/' },
+      { label: '职位简章', url: 'https://shacs.gov.cn/' },
+    ],
+  },
+  {
+    id: 'info-hubei-xuandiao-2026',
+    title: '2026湖北省选调公告',
+    category: '湖北',
+    subcategory: '选调',
+    date: '2026-09-01',
+    content: '湖北省2026年选调应届优秀大学毕业生到基层工作公告。笔试科目为《综合能力测试》，考试时间为9:00-12:00。',
+    links: [
+      { label: '公告原文', url: 'http://www.hbsrsksy.cn/' },
+      { label: '职位简章', url: 'http://www.hbsrsksy.cn/' },
+    ],
+    talk: {
+      title: '湖北选调生宣讲会',
+      time: '2026年9月15日 15:00',
+      location: '四平路校区中法中心C301',
+    },
+  },
+  {
+    id: 'info-henan-shengkao-2026',
+    title: '2026河南省考公告',
+    category: '河南',
+    subcategory: '省考',
+    date: '2026-01-15',
+    content: '河南省2026年度统一考试录用公务员公告。公共科目笔试为《行政职业能力测验》和《申论》，参加多省公务员联考。',
+    links: [
+      { label: '公告原文', url: 'http://www.hnrsks.com/' },
+      { label: '职位简章', url: 'http://www.hnrsks.com/' },
+    ],
+  },
 ];
 
 /* ====================================================================

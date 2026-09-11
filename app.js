@@ -67,6 +67,7 @@ const toast = (msg, type = 'info') => {
 /* ---------- 数据存储 ---------- */
 const defaultState = () => ({
   exams: [...DEFAULT_EXAMS],
+  examInfo: typeof DEFAULT_EXAM_INFO !== 'undefined' ? [...DEFAULT_EXAM_INFO] : [],
   plans: [],
   checkins: {},
   stats: [],
@@ -99,9 +100,53 @@ const loadState = () => {
       politicsToday: parsed.politicsToday || [],
       politicsPast: parsed.politicsPast || [],
       studyPlan: parsed.studyPlan || {},
+      examInfo: parsed.examInfo || defaultState().examInfo,
       sync: parsed.sync || {},
       meta: { ...defaultState().meta, ...(parsed.meta || {}) } };
+    // 旧考试数据迁移：补齐 type / subjects
+    state.exams = (state.exams || []).map(migrateExam);
   } catch (e) { console.warn('数据读取失败', e); }
+};
+
+const EXAM_TYPE_HINTS = ['国考', '省考', '选调', '市考'];
+const DEFAULT_SUBJECTS = {
+  '国考笔试': [
+    { name: '行政职业能力测验', duration: '120分钟', timeRange: '9:00-11:00' },
+    { name: '申论', duration: '180分钟', timeRange: '14:00-17:00' },
+  ],
+  '国考': [
+    { name: '行政职业能力测验', duration: '120分钟', timeRange: '9:00-11:00' },
+    { name: '申论', duration: '180分钟', timeRange: '14:00-17:00' },
+  ],
+  '湖北省选调': [
+    { name: '综合能力测试', duration: '180分钟', timeRange: '9:00-12:00' },
+  ],
+  '湖北选调': [
+    { name: '综合能力测试', duration: '180分钟', timeRange: '9:00-12:00' },
+  ],
+  '上海市选调': [
+    { name: '综合能力测试', duration: '180分钟', timeRange: '9:00-12:00' },
+  ],
+  '上海选调': [
+    { name: '综合能力测试', duration: '180分钟', timeRange: '9:00-12:00' },
+  ],
+};
+const migrateExam = (exam) => {
+  if (!exam) return exam;
+  if (!exam.type) {
+    const hint = EXAM_TYPE_HINTS.find(t => exam.name && exam.name.includes(t));
+    exam.type = hint || '其他';
+  }
+  if (!exam.subjects || !exam.subjects.length) {
+    for (const key of Object.keys(DEFAULT_SUBJECTS)) {
+      if (exam.name && exam.name.includes(key)) {
+        exam.subjects = DEFAULT_SUBJECTS[key].map(s => ({ ...s }));
+        break;
+      }
+    }
+    if (!exam.subjects) exam.subjects = [];
+  }
+  return exam;
 };
 
 let _saveTimer = null;
@@ -129,7 +174,7 @@ const ROUTES = [
   'home', 'countdown', 'daily-plan',
   'politics', 'common-sense', 'language', 'logic',
   'quantity', 'data-analysis', 'stats',
-  'shenlun-small', 'shenlun-big', 'errors'
+  'shenlun-small', 'shenlun-big', 'errors', 'exam-info'
 ];
 const MODULE_ROUTES = ['politics','common-sense','language','logic','quantity','data-analysis','shenlun-small','shenlun-big'];
 const ROUTE_CAT = {
@@ -163,6 +208,7 @@ const onEnter = (route) => {
     case 'shenlun-small': renderShenlunSmall(); break;
     case 'shenlun-big': renderShenlunBig(); break;
     case 'errors': renderErrors(); break;
+    case 'exam-info': renderExamInfo(); break;
   }
   if (MODULE_ROUTES.includes(route)) renderModuleHeader(route);
 };
@@ -219,40 +265,152 @@ const renderExamList = () => {
     const passed = days < 0;
     const regDays = exam.regDate ? daysBetween(today(), exam.regDate) : null;
     const regPassed = regDays !== null && regDays < 0;
-    const regText = exam.regDate ? `｜报名：${exam.regDate}（${regPassed ? '已结束' : '还剩 ' + regDays + ' 天'}）` : '';
-    const regLink = exam.url ? `<a class="exam-link" href="${escapeAttr(exam.url)}" target="_blank" rel="noopener">🔗 报名官网</a>` : '';
-    const regTip = (regDays !== null && regDays >= 0 && regDays <= 14) ? `<div class="exam-reg-tip">⚠️ 报名还剩 ${regDays} 天，请尽快前往官网完成！</div>` : '';
+    const regText = exam.regDate ? `报名：${exam.regDate} · ${regPassed ? '已结束' : '还剩 ' + regDays + ' 天'}` : '报名日期未设置';
     return `
-      <div class="exam-item ${urgent ? 'urgent' : ''}">
-        <div class="exam-info">
-          <div class="exam-name">📌 ${escapeHtml(exam.name)} ${regLink}</div>
-          <div class="exam-date">考试：${exam.date} ${passed ? '· 已过' : '· 还剩 ' + days + ' 天'}${regText}</div>
-          ${regTip}
+      <div class="exam-card ${urgent ? 'urgent' : ''} ${passed ? 'passed' : ''}" data-detail-exam="${exam.id}">
+        <div class="exam-card-top">
+          <div class="exam-card-title">${escapeHtml(exam.name)}</div>
+          <div class="exam-card-actions">
+            <button class="ghost-btn small" data-edit-exam="${exam.id}" title="编辑">✏️ 编辑</button>
+            <button class="danger-btn" data-del-exam="${exam.id}" title="删除">删除</button>
+          </div>
         </div>
-        <div class="exam-days ${urgent ? 'urgent' : ''}">${passed ? '已过' : days}<span class="small">${passed ? '' : '天'}</span></div>
-        <button class="danger-btn" data-del-exam="${exam.id}">删除</button>
+        <div class="exam-card-main">
+          <div class="exam-card-days">${passed ? '已结束' : days}<span class="exam-card-unit">${passed ? '' : '天后开考'}</span></div>
+          <div class="exam-card-meta">
+            <div class="exam-card-date">📅 考试：${exam.date}</div>
+            <div class="exam-card-reg">⏰ ${regText}</div>
+          </div>
+        </div>
       </div>`;
   }).join('');
   el.querySelectorAll('[data-del-exam]').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!confirm('确定删除该考试？')) return;
       state.exams = state.exams.filter(e => e.id !== btn.dataset.delExam);
       saveState(); renderExamList(); toast('已删除');
     });
   });
+  el.querySelectorAll('[data-edit-exam]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const exam = state.exams.find(e => e.id === btn.dataset.editExam);
+      if (exam) openExamModal(exam);
+    });
+  });
+  el.querySelectorAll('[data-detail-exam]').forEach(card => {
+    card.addEventListener('click', () => {
+      const exam = state.exams.find(e => e.id === card.dataset.detailExam);
+      if (exam) openExamDetail(exam);
+    });
+  });
 };
 
-const addExam = () => {
-  const name = prompt('考试名称（如：国考笔试 / 省考面试）');
-  if (!name) return;
-  const date = prompt('考试日期（YYYY-MM-DD）');
-  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) { toast('日期格式不正确', 'error'); return; }
-  const regDate = prompt('报名开始/截止日期（YYYY-MM-DD，没有则留空）');
-  const exam = { id: 'e_' + Date.now(), name, date };
-  if (regDate && /^\d{4}-\d{2}-\d{2}$/.test(regDate)) exam.regDate = regDate;
-  const urlRaw = prompt('报名 / 官网网址（没有则留空，如 https://bm.scs.gov.cn/）');
-  if (urlRaw && /^https?:\/\//i.test(urlRaw.trim())) exam.url = urlRaw.trim();
-  state.exams.push(exam);
-  saveState(); renderExamList(); toast('已添加');
+const addExam = () => { openExamModal(null); };
+
+const openExamDetail = (exam) => {
+  const days = daysBetween(today(), exam.date);
+  const passed = days < 0;
+  $('#detailExamName').textContent = exam.name;
+  $('#detailExamStatus').textContent = passed ? '已结束' : `${days} 天后开考`;
+  $('#detailExamDate').textContent = `考试日期：${exam.date}`;
+  const regDays = exam.regDate ? daysBetween(today(), exam.regDate) : null;
+  const regPassed = regDays !== null && regDays < 0;
+  $('#detailExamReg').textContent = exam.regDate
+    ? `${exam.regDate}（${regPassed ? '报名已结束' : `距离报名还剩 ${regDays} 天`}）`
+    : '未设置';
+  const urlEl = $('#detailExamUrl');
+  if (exam.url) { urlEl.href = exam.url; urlEl.textContent = exam.url; urlEl.style.display = 'inline-flex'; }
+  else { urlEl.style.display = 'none'; }
+  const subEl = $('#detailExamSubjects');
+  if (exam.subjects && exam.subjects.length) {
+    subEl.innerHTML = exam.subjects.map(s => `
+      <div class="exam-subject-item">
+        <span class="exam-subject-name">${escapeHtml(s.name)}</span>
+        <span class="exam-subject-tag">${escapeHtml(s.duration)}</span>
+        ${s.timeRange ? `<span class="exam-subject-tag time">${escapeHtml(s.timeRange)}</span>` : ''}
+      </div>`).join('');
+  } else {
+    subEl.innerHTML = '<div class="muted">暂未填写笔试科目</div>';
+  }
+  $('#detailExamEdit').onclick = () => { $('#examDetailModal').hidden = true; openExamModal(exam); };
+  $('#detailExamDelete').onclick = () => {
+    if (!confirm('确定删除该考试？')) return;
+    state.exams = state.exams.filter(e => e.id !== exam.id);
+    saveState(); $('#examDetailModal').hidden = true; renderExamList(); toast('已删除');
+  };
+  $('#detailExamClose').onclick = () => { $('#examDetailModal').hidden = true; };
+  $('#examDetailModal').hidden = false;
+};
+
+let examEditTarget = null;
+const openExamModal = (exam) => {
+  examEditTarget = exam;
+  $('#examEditTitle').textContent = exam ? '编辑考试' : '添加考试';
+  $('#examEditName').value = exam ? exam.name : '';
+  $('#examEditDate').value = exam ? exam.date : '';
+  $('#examEditRegDate').value = exam ? (exam.regDate || '') : '';
+  $('#examEditUrl').value = exam ? (exam.url || '') : '';
+  $('#examEditType').value = exam ? (exam.type || '其他') : '其他';
+  renderExamSubjectInputs(exam ? (exam.subjects || []) : []);
+  $('#examEditModal').hidden = false;
+};
+
+const renderExamSubjectInputs = (subjects) => {
+  const wrap = $('#examSubjectList');
+  wrap.innerHTML = (subjects || []).map((s, i) => `
+    <div class="exam-subject-input" data-si="${i}">
+      <input type="text" class="text-input sub-name" placeholder="科目名" value="${escapeAttr(s.name)}">
+      <input type="text" class="text-input sub-duration" placeholder="时限" value="${escapeAttr(s.duration)}">
+      <input type="text" class="text-input sub-time" placeholder="时段 如 9:00-12:00" value="${escapeAttr(s.timeRange || '')}">
+      <button type="button" class="danger-btn sub-del">✕</button>
+    </div>`).join('');
+  wrap.querySelectorAll('.sub-del').forEach(btn => {
+    btn.addEventListener('click', () => { btn.closest('.exam-subject-input').remove(); });
+  });
+};
+
+const addExamSubjectRow = () => {
+  const wrap = $('#examSubjectList');
+  const div = document.createElement('div');
+  div.className = 'exam-subject-input';
+  div.innerHTML = `
+    <input type="text" class="text-input sub-name" placeholder="科目名">
+    <input type="text" class="text-input sub-duration" placeholder="时限">
+    <input type="text" class="text-input sub-time" placeholder="时段 如 9:00-12:00">
+    <button type="button" class="danger-btn sub-del">✕</button>`;
+  div.querySelector('.sub-del').addEventListener('click', () => div.remove());
+  wrap.appendChild(div);
+};
+
+const saveExam = () => {
+  const name = $('#examEditName').value.trim();
+  const date = $('#examEditDate').value;
+  const regDate = $('#examEditRegDate').value;
+  const url = $('#examEditUrl').value.trim();
+  const type = $('#examEditType').value;
+  if (!name) { toast('请填写考试名称', 'error'); return; }
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) { toast('请选择考试日期', 'error'); return; }
+  const subjects = [];
+  $('#examSubjectList').querySelectorAll('.exam-subject-input').forEach(row => {
+    const n = row.querySelector('.sub-name').value.trim();
+    const d = row.querySelector('.sub-duration').value.trim();
+    const t = row.querySelector('.sub-time').value.trim();
+    if (n) subjects.push({ name: n, duration: d, timeRange: t });
+  });
+  const payload = { name, date, type, subjects };
+  if (regDate && /^\d{4}-\d{2}-\d{2}$/.test(regDate)) payload.regDate = regDate;
+  if (url && /^https?:\/\//i.test(url)) payload.url = url;
+  if (examEditTarget) {
+    Object.assign(examEditTarget, payload);
+    toast('已保存');
+  } else {
+    payload.id = 'e_' + Date.now();
+    state.exams.push(payload);
+    toast('已添加');
+  }
+  saveState(); renderExamList(); $('#examEditModal').hidden = true;
 };
 
 const rotateMao = (delta) => {
@@ -1007,6 +1165,210 @@ const addErr = () => {
   saveState(); renderErrors(); toast('已保存');
 };
 
+/* ---------- 考试汇总 ---------- */
+const EXAM_INFO_FIXED_CATS = ['全部', '国考', '省考', '选调', '市考', '河南', '上海', '湖北', '北京', '广东', '浙江', '江苏'];
+let examInfoFilter = { category: '全部', subcategory: '全部', q: '' };
+let examInfoEditTarget = null;
+
+const renderExamInfo = () => { renderExamInfoFilters(); renderExamInfoList(); };
+
+const getExamInfoCats = () => {
+  const set = new Set(EXAM_INFO_FIXED_CATS);
+  (state.examInfo || []).forEach(i => { if (i.category) set.add(i.category); });
+  return EXAM_INFO_FIXED_CATS.filter(c => set.has(c));
+};
+
+const getExamInfoSubcats = () => {
+  const set = new Set();
+  (state.examInfo || []).forEach(i => {
+    if (i.subcategory && (examInfoFilter.category === '全部' || i.category === examInfoFilter.category)) set.add(i.subcategory);
+  });
+  return ['全部', ...Array.from(set).sort()];
+};
+
+const renderExamInfoFilters = () => {
+  const cats = getExamInfoCats();
+  const chips = $('#examInfoChips');
+  chips.innerHTML = cats.map(c => `
+    <button class="info-chip ${examInfoFilter.category === c ? 'active' : ''}" data-cat="${escapeAttr(c)}">${escapeHtml(c)}</button>`).join('');
+  chips.querySelectorAll('[data-cat]').forEach(btn => {
+    btn.addEventListener('click', () => { examInfoFilter.category = btn.dataset.cat; examInfoFilter.subcategory = '全部'; renderExamInfo(); });
+  });
+
+  const subCats = getExamInfoSubcats();
+  const subEl = $('#examInfoSubChips');
+  if (subCats.length <= 1) { subEl.innerHTML = ''; subEl.hidden = true; }
+  else {
+    subEl.hidden = false;
+    subEl.innerHTML = subCats.map(c => `
+      <button class="info-chip sub ${examInfoFilter.subcategory === c ? 'active' : ''}" data-subcat="${escapeAttr(c)}">${escapeHtml(c)}</button>`).join('');
+    subEl.querySelectorAll('[data-subcat]').forEach(btn => {
+      btn.addEventListener('click', () => { examInfoFilter.subcategory = btn.dataset.subcat; renderExamInfoList(); });
+    });
+  }
+};
+
+const renderExamInfoList = () => {
+  const el = $('#examInfoList');
+  const q = (examInfoFilter.q || '').trim().toLowerCase();
+  const list = (state.examInfo || []).filter(i => {
+    if (examInfoFilter.category !== '全部' && i.category !== examInfoFilter.category) return false;
+    if (examInfoFilter.subcategory !== '全部' && i.subcategory !== examInfoFilter.subcategory) return false;
+    if (!q) return true;
+    const hay = `${i.title} ${i.category} ${i.subcategory} ${i.content}`.toLowerCase();
+    return hay.includes(q);
+  }).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+  if (!list.length) {
+    el.innerHTML = '<div class="muted" style="text-align:center;padding:24px">暂无匹配信息，可点击右上角「添加」或导入 JSON</div>';
+    return;
+  }
+  el.innerHTML = list.map(item => `
+    <div class="info-card" data-info-id="${item.id}">
+      <div class="info-card-head">
+        <div class="info-card-title">${escapeHtml(item.title)}</div>
+        <div class="info-card-tags">
+          <span class="info-tag cat">${escapeHtml(item.category || '其他')}</span>
+          ${item.subcategory ? `<span class="info-tag sub">${escapeHtml(item.subcategory)}</span>` : ''}
+          ${item.date ? `<span class="info-tag date">${escapeHtml(item.date)}</span>` : ''}
+        </div>
+      </div>
+      <div class="info-card-body">${escapeHtml(item.content || '').replace(/\n/g, '<br>')}</div>
+      ${(item.links && item.links.length) ? `<div class="info-card-links">${item.links.map(l => `<a class="info-link" href="${escapeAttr(l.url)}" target="_blank" rel="noopener">${escapeHtml(l.label || '链接')}</a>`).join('')}</div>` : ''}
+      ${item.talk ? `
+        <div class="info-talk-card">
+          <div class="info-talk-title">【${escapeHtml(item.talk.title)}】</div>
+          <div class="info-talk-row">⏰ 时间：${escapeHtml(item.talk.time)}</div>
+          <div class="info-talk-row">📍 地点：${escapeHtml(item.talk.location)}</div>
+        </div>` : ''}
+      <div class="info-card-actions">
+        <button class="ghost-btn small" data-edit-info="${item.id}">✏️ 编辑</button>
+        <button class="danger-btn" data-del-info="${item.id}">删除</button>
+      </div>
+    </div>`).join('');
+
+  el.querySelectorAll('[data-del-info]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!confirm('确定删除该条信息？')) return;
+      state.examInfo = state.examInfo.filter(i => i.id !== btn.dataset.delInfo);
+      saveState(); renderExamInfo(); toast('已删除');
+    });
+  });
+  el.querySelectorAll('[data-edit-info]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const item = state.examInfo.find(i => i.id === btn.dataset.editInfo);
+      if (item) openExamInfoModal(item);
+    });
+  });
+};
+
+const openExamInfoModal = (item) => {
+  examInfoEditTarget = item || null;
+  $('#examInfoEditTitle').textContent = item ? '编辑考试信息' : '添加考试信息';
+  $('#examInfoEditTitleInput').value = item ? item.title : '';
+  $('#examInfoEditCategory').value = item ? (item.category || '') : '';
+  $('#examInfoEditSubcategory').value = item ? (item.subcategory || '') : '';
+  $('#examInfoEditDate').value = item ? (item.date || '') : '';
+  $('#examInfoEditContent').value = item ? (item.content || '') : '';
+  renderExamInfoLinkInputs(item ? (item.links || []) : []);
+  const hasTalk = !!(item && item.talk);
+  $('#examInfoHasTalk').checked = hasTalk;
+  $('#examInfoTalkFields').hidden = !hasTalk;
+  $('#examInfoTalkTitle').value = hasTalk ? item.talk.title : '';
+  $('#examInfoTalkTime').value = hasTalk ? item.talk.time : '';
+  $('#examInfoTalkLocation').value = hasTalk ? item.talk.location : '';
+  $('#examInfoEditModal').hidden = false;
+};
+
+const renderExamInfoLinkInputs = (links) => {
+  const wrap = $('#examInfoLinkList');
+  wrap.innerHTML = (links || []).map((l, i) => `
+    <div class="exam-info-link-input" data-li="${i}">
+      <input type="text" class="text-input link-label" placeholder="链接名称" value="${escapeAttr(l.label)}">
+      <input type="text" class="text-input link-url" placeholder="https://..." value="${escapeAttr(l.url)}">
+      <button type="button" class="danger-btn link-del">✕</button>
+    </div>`).join('');
+  wrap.querySelectorAll('.link-del').forEach(btn => {
+    btn.addEventListener('click', () => { btn.closest('.exam-info-link-input').remove(); });
+  });
+};
+
+const addExamInfoLinkRow = () => {
+  const wrap = $('#examInfoLinkList');
+  const div = document.createElement('div'); div.className = 'exam-info-link-input';
+  div.innerHTML = `
+    <input type="text" class="text-input link-label" placeholder="链接名称">
+    <input type="text" class="text-input link-url" placeholder="https://...">
+    <button type="button" class="danger-btn link-del">✕</button>`;
+  div.querySelector('.link-del').addEventListener('click', () => div.remove());
+  wrap.appendChild(div);
+};
+
+const saveExamInfo = () => {
+  const title = $('#examInfoEditTitleInput').value.trim();
+  const category = $('#examInfoEditCategory').value.trim();
+  if (!title || !category) { toast('请填写标题和地区/大类', 'error'); return; }
+  const links = [];
+  $('#examInfoLinkList').querySelectorAll('.exam-info-link-input').forEach(row => {
+    const label = row.querySelector('.link-label').value.trim();
+    const url = row.querySelector('.link-url').value.trim();
+    if (label && url && /^https?:\/\//i.test(url)) links.push({ label, url });
+  });
+  const hasTalk = $('#examInfoHasTalk').checked;
+  const talk = hasTalk ? {
+    title: $('#examInfoTalkTitle').value.trim(),
+    time: $('#examInfoTalkTime').value.trim(),
+    location: $('#examInfoTalkLocation').value.trim(),
+  } : null;
+  const payload = {
+    title, category,
+    subcategory: $('#examInfoEditSubcategory').value.trim(),
+    date: $('#examInfoEditDate').value,
+    content: $('#examInfoEditContent').value.trim(),
+    links,
+    talk,
+  };
+  if (examInfoEditTarget) {
+    Object.assign(examInfoEditTarget, payload);
+    toast('已保存');
+  } else {
+    payload.id = 'info_' + Date.now();
+    state.examInfo.push(payload);
+    toast('已添加');
+  }
+  saveState(); renderExamInfo(); $('#examInfoEditModal').hidden = true;
+};
+
+const exportExamInfo = () => {
+  const data = JSON.stringify(state.examInfo || [], null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `考试汇总_${today()}.json`; a.click();
+  URL.revokeObjectURL(url); toast('已导出');
+};
+const importExamInfo = (file) => {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!Array.isArray(data)) throw new Error('文件应为考试信息数组');
+      if (!confirm(`导入将追加/覆盖 ${data.length} 条考试信息，确定继续？`)) return;
+      const merged = [...(state.examInfo || [])];
+      data.forEach(it => {
+        if (!it.id) it.id = 'info_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+        const idx = merged.findIndex(x => x.id === it.id);
+        if (idx >= 0) merged[idx] = it; else merged.push(it);
+      });
+      state.examInfo = merged;
+      saveState(); renderExamInfo(); toast('导入成功');
+    } catch (err) { toast('导入失败：' + err.message, 'error'); }
+  };
+  reader.readAsText(file);
+};
+
 /* ---------- 错题库导出 ---------- */
 const updateExportCount = () => {
   const n = state.errors.length;
@@ -1209,6 +1571,9 @@ const bindEvents = () => {
   $('#backdrop').addEventListener('click', closeSidebar);
 
   $('#addExamBtn').addEventListener('click', addExam);
+  $('#examEditCancel').addEventListener('click', () => $('#examEditModal').hidden = true);
+  $('#examEditSave').addEventListener('click', saveExam);
+  $('#examAddSubjectBtn').addEventListener('click', addExamSubjectRow);
   $('#maoPrev').addEventListener('click', () => rotateMao(-1));
   $('#maoNext').addEventListener('click', () => rotateMao(1));
 
@@ -1250,6 +1615,17 @@ const bindEvents = () => {
   $('#politicsRefresh').addEventListener('click', () => {
     state.pref.pastOffset = (state.pref.pastOffset || 0) + 1; saveState(); renderPolitics(); toast('已换一批');
   });
+
+  // 考试汇总
+  $('#addExamInfoBtn').addEventListener('click', () => openExamInfoModal(null));
+  $('#examInfoSearch').addEventListener('input', (e) => { examInfoFilter.q = e.target.value; renderExamInfoList(); });
+  $('#exportExamInfoBtn').addEventListener('click', exportExamInfo);
+  $('#importExamInfoBtn').addEventListener('click', () => $('#importExamInfoFile').click());
+  $('#importExamInfoFile').addEventListener('change', (e) => { const f = e.target.files[0]; if (f) importExamInfo(f); e.target.value = ''; });
+  $('#examInfoEditCancel').addEventListener('click', () => $('#examInfoEditModal').hidden = true);
+  $('#examInfoEditSave').addEventListener('click', saveExamInfo);
+  $('#examInfoAddLinkBtn').addEventListener('click', addExamInfoLinkRow);
+  $('#examInfoHasTalk').addEventListener('change', (e) => { $('#examInfoTalkFields').hidden = !e.target.checked; });
 
   const pickAvatar = (inputId) => { const el = $(inputId); if (el) el.click(); };
   $('#avatarWrap').addEventListener('click', () => pickAvatar('#avatarInput'));
