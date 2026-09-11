@@ -587,8 +587,10 @@ textarea.text-input { border-radius: var(--radius-sm); resize: vertical; }
 .pomofab.active { animation: pomoPulse 1.4s infinite; }
 @keyframes pomoPulse { 0%,100%{ box-shadow: var(--shadow);} 50%{ box-shadow: 0 0 0 10px rgba(168,230,207,0.35);} }
 .pomo-panel { position: fixed; right: 1.4em; bottom: 5em; z-index: 47; width: 18em; max-width: 90vw; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.1em; border: 1.5px solid var(--blue-border); }
-.pomo-head { display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--text-strong); }
+.pomo-head { display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--text-strong); gap: 0.4em; }
+.pomo-hide { background: var(--card-2); border: none; border-radius: 50%; width: 1.8em; height: 1.8em; cursor: pointer; font-size: 0.9em; }
 .pomo-close { background: var(--card-2); border: none; border-radius: 50%; width: 1.8em; height: 1.8em; cursor: pointer; font-size: 0.9em; }
+.pomo-show { position: fixed; right: 1.4em; bottom: 5em; z-index: 46; border: 1.5px solid var(--blue-border); background: var(--card); border-radius: 999px; padding: 0.5em 1em; cursor: pointer; font-weight: 700; font-size: 0.9em; color: var(--text-strong); box-shadow: var(--shadow); }
 .pomo-tabs { display: flex; gap: 0.5em; margin: 0.8em 0; }
 .pomo-tab { flex: 1; border: 1.5px solid var(--blue-border); background: var(--card); border-radius: 999px; padding: 0.4em; cursor: pointer; font-weight: 700; font-size: 0.82em; color: var(--text); }
 .pomo-tab.active { background: var(--grad-btn); border-color: var(--sky-deep); }
@@ -975,6 +977,40 @@ textarea.text-input { border-radius: var(--radius-sm); resize: vertical; }
 .info-tag.cat { background: #ff9eb4; color: #fff; }
 .info-tag.sub { background: #ffe4ea; color: #a6546a; }
 .info-tag.date { background: #f0e7da; color: var(--text); }
+.info-tag.reg { background: #d7f0e3; color: #2e7d5b; }
+
+/* ===== 工具合集：百分化 / 年均增长率 / 截面图（通用 quiz 卡片） ===== */
+.quiz-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.2em; border: 1.5px solid var(--blue-border); max-width: 32em; margin: 0 auto; }
+.quiz-stat { font-size: 0.85em; color: var(--text); margin-bottom: 0.6em; }
+.quiz-stat b { color: var(--sky-deep); font-size: 1.1em; }
+.quiz-q { font-size: 1.05em; font-weight: 700; color: var(--text-strong); line-height: 1.6; margin-bottom: 1em; }
+.quiz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6em; margin-bottom: 0.8em; }
+.quiz-opt { border: 1.5px solid var(--blue-border); background: var(--card-2); border-radius: 999px; padding: 0.7em; cursor: pointer; font-weight: 700; color: var(--text-strong); transition: transform .08s, background .15s; }
+.quiz-opt:hover { transform: translateY(-1px); background: #ffe9d6; }
+.quiz-opt.correct { background: #d7f0e3; border-color: #2e7d5b; color: #2e7d5b; }
+.quiz-opt.wrong { background: #ffd9d9; border-color: #c0392b; color: #c0392b; }
+.quiz-fb { min-height: 1.4em; font-weight: 700; margin-bottom: 0.6em; }
+.quiz-fb.ok { color: #2e7d5b; }
+.quiz-fb.bad { color: #c0392b; }
+.quiz-actions { text-align: center; }
+.section-canvas-wrap { text-align: center; margin-bottom: 1em; }
+.section-canvas-wrap canvas { border-radius: var(--radius); max-width: 100%; }
+
+/* ===== 每日时政 ===== */
+.politics-chips { display: flex; flex-wrap: wrap; gap: 0.4em; margin-bottom: 1em; }
+.politics-list { display: flex; flex-direction: column; gap: 0.6em; max-width: 40em; }
+.politics-item { display: flex; align-items: flex-start; gap: 0.6em; background: var(--card); border: 1.5px solid var(--blue-border); border-radius: var(--radius); padding: 0.8em 1em; box-shadow: var(--shadow); }
+.politics-item.faved { border-color: #ffb84d; background: #fff7ec; }
+.politics-main { flex: 1; }
+.politics-date { font-size: 0.78em; color: #999; margin-left: 0.4em; }
+.politics-title { margin-top: 0.3em; line-height: 1.6; color: var(--text); }
+.politics-fav { background: none; border: none; font-size: 1.3em; cursor: pointer; line-height: 1; }
+.tg-会议 { background: #ffd6a5; color: #a35a00; }
+.tg-科技 { background: #cfe3ff; color: #2a5db0; }
+.tg-民生 { background: #d9f5e3; color: #2e7d5b; }
+.tg-经济 { background: #fff0c2; color: #9a7b00; }
+.tg-生态 { background: #d6efd0; color: #3c7a2e; }
+.tg-国际 { background: #e7dcff; color: #6b46c1; }
 .info-card-body { font-size: 0.9em; line-height: 1.7; color: var(--text); margin-bottom: 0.6em; }
 .info-card-links { display: flex; flex-wrap: wrap; gap: 0.4em; margin-bottom: 0.6em; }
 .info-link {

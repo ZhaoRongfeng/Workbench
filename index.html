@@ -112,6 +112,18 @@
           <a class="nav-item" data-route="exam-info" data-page-node-id="examInfoNavItem">
             <span class="nav-icon" data-page-node-id="examInfoNavIcon">📰</span><span class="nav-label" data-page-node-id="examInfoNavLabel">考试汇总</span>
           </a>
+          <a class="nav-item" data-route="tool-percent" data-page-node-id="toolPercentNavItem">
+            <span class="nav-icon">🎯</span><span class="nav-label">百分化游戏</span>
+          </a>
+          <a class="nav-item" data-route="tool-politics" data-page-node-id="toolPoliticsNavItem">
+            <span class="nav-icon">📰</span><span class="nav-label">每日时政</span>
+          </a>
+          <a class="nav-item" data-route="tool-growth" data-page-node-id="toolGrowthNavItem">
+            <span class="nav-icon">📈</span><span class="nav-label">年均增长率</span>
+          </a>
+          <a class="nav-item" data-route="tool-section" data-page-node-id="toolSectionNavItem">
+            <span class="nav-icon">🔷</span><span class="nav-label">截面图练习</span>
+          </a>
         </div>
       </nav>
 
@@ -681,7 +693,41 @@
         <div class="exam-info-list" id="examInfoList" data-page-node-id="examInfoList"></div>
       </section>
 
-      <!-- 欢迎页 -->
+      <!-- 百分化游戏 -->
+      <section class="view" data-view="tool-percent" data-page-node-id="toolPercentView">
+        <div class="view-header">
+          <h2>🎯 百分化游戏</h2>
+          <p class="muted">分数 → 百分数，四选一速算，练出手感</p>
+        </div>
+        <div id="toolPercentRoot"></div>
+      </section>
+
+      <!-- 每日时政 -->
+      <section class="view" data-view="tool-politics" data-page-node-id="toolPoliticsView">
+        <div class="view-header">
+          <h2>📰 每日时政</h2>
+          <p class="muted">按标签筛选时政要点，可收藏重点</p>
+        </div>
+        <div id="toolPoliticsRoot"></div>
+      </section>
+
+      <!-- 年均增长率练习 -->
+      <section class="view" data-view="tool-growth" data-page-node-id="toolGrowthView">
+        <div class="view-header">
+          <h2>📈 年均增长率练习</h2>
+          <p class="muted">r = (B/A)^(1/n) − 1，四选一速算</p>
+        </div>
+        <div id="toolGrowthRoot"></div>
+      </section>
+
+      <!-- 截面图练习 -->
+      <section class="view" data-view="tool-section" data-page-node-id="toolSectionView">
+        <div class="view-header">
+          <h2>🔷 截面图练习</h2>
+          <p class="muted">立体图形截面可视化 + 四选一</p>
+        </div>
+        <div id="toolSectionRoot"></div>
+      </section>
       <section class="view active" data-view="home" data-page-node-id="AUX7RPz0fHQGkWvh6w4RcK">
         <div class="welcome" data-page-node-id="zukLURtAiATgxHjOxbNLM5">
           <div class="welcome-card" data-page-node-id="3H48ZJwoT8exNBjCsjbBzk">
@@ -715,6 +761,7 @@
   <div class="pomo-panel" id="pomoPanel" hidden data-page-node-id="lb74uhHcGVGkavXXCRUhrv">
     <div class="pomo-head" data-page-node-id="7C75kflQRTTiimZLz7sMRG">
       <span class="pomo-title" data-page-node-id="tE5NVrFEVoFj2cZu3mTBva">🍅 番茄钟</span>
+      <button class="pomo-hide" id="pomoHide" title="隐藏番茄钟" data-page-node-id="pomoHideNode">🙈</button>
       <button class="pomo-close" id="pomoClose" data-page-node-id="dv9WMej6G9Z1XqQKQg6egj">✕</button>
     </div>
     <div class="pomo-tabs" data-page-node-id="WLRSFLZGCGcRrACOAAwqi8">
@@ -749,6 +796,9 @@
       <button class="primary-btn" id="pomoModalOk" data-page-node-id="ns6E8tp4iSykJ2NkG6jZg1">继续加油</button>
     </div>
   </div>
+
+  <!-- 番茄钟收起后的重新唤出按钮 -->
+  <button class="pomo-show" id="pomoShow" hidden title="展开番茄钟">🍅 番茄钟</button>
 
   <!-- 语音识别 -->
   <div class="voice-modal" id="voiceModal" hidden data-page-node-id="W4TzJnEroRGdcVfLp45xdp">
@@ -858,8 +908,12 @@
         <input type="date" id="examEditDate" class="text-input">
       </div>
       <div class="modal-row">
-        <label>报名日期</label>
-        <input type="date" id="examEditRegDate" class="text-input">
+        <label>报名时间（起）</label>
+        <input type="date" id="examEditRegStart" class="text-input">
+      </div>
+      <div class="modal-row">
+        <label>报名时间（止）</label>
+        <input type="date" id="examEditRegEnd" class="text-input">
       </div>
       <div class="modal-row">
         <label>报名官网</label>
@@ -905,6 +959,14 @@
       <div class="modal-row">
         <label>公告日期</label>
         <input type="date" id="examInfoEditDate" class="text-input">
+      </div>
+      <div class="modal-row">
+        <label>报名时间（起）</label>
+        <input type="date" id="examInfoEditRegStart" class="text-input">
+      </div>
+      <div class="modal-row">
+        <label>报名时间（止）</label>
+        <input type="date" id="examInfoEditRegEnd" class="text-input">
       </div>
       <div class="modal-row">
         <label>内容摘要</label>

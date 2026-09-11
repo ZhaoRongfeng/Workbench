@@ -174,7 +174,8 @@ const ROUTES = [
   'home', 'countdown', 'daily-plan',
   'politics', 'common-sense', 'language', 'logic',
   'quantity', 'data-analysis', 'stats',
-  'shenlun-small', 'shenlun-big', 'errors', 'exam-info'
+  'shenlun-small', 'shenlun-big', 'errors', 'exam-info',
+  'tool-percent', 'tool-politics', 'tool-growth', 'tool-section'
 ];
 const MODULE_ROUTES = ['politics','common-sense','language','logic','quantity','data-analysis','shenlun-small','shenlun-big'];
 const ROUTE_CAT = {
@@ -209,6 +210,10 @@ const onEnter = (route) => {
     case 'shenlun-big': renderShenlunBig(); break;
     case 'errors': renderErrors(); break;
     case 'exam-info': renderExamInfo(); break;
+    case 'tool-percent': renderToolPercent(); break;
+    case 'tool-politics': renderToolPolitics(); break;
+    case 'tool-growth': renderToolGrowth(); break;
+    case 'tool-section': renderToolSection(); break;
   }
   if (MODULE_ROUTES.includes(route)) renderModuleHeader(route);
 };
@@ -265,7 +270,9 @@ const renderExamList = () => {
     const passed = days < 0;
     const regDays = exam.regDate ? daysBetween(today(), exam.regDate) : null;
     const regPassed = regDays !== null && regDays < 0;
-    const regText = exam.regDate ? `报名：${exam.regDate} · ${regPassed ? '已结束' : '还剩 ' + regDays + ' 天'}` : '报名日期未设置';
+    const regText = regRangeText(exam)
+      ? `报名：${regRangeText(exam)}${regStatusText(exam) ? ' · ' + regStatusText(exam) : ''}`
+      : '报名日期未设置';
     return `
       <div class="exam-card ${urgent ? 'urgent' : ''} ${passed ? 'passed' : ''}" data-detail-exam="${exam.id}">
         <div class="exam-card-top">
@@ -317,8 +324,8 @@ const openExamDetail = (exam) => {
   $('#detailExamDate').textContent = `考试日期：${exam.date}`;
   const regDays = exam.regDate ? daysBetween(today(), exam.regDate) : null;
   const regPassed = regDays !== null && regDays < 0;
-  $('#detailExamReg').textContent = exam.regDate
-    ? `${exam.regDate}（${regPassed ? '报名已结束' : `距离报名还剩 ${regDays} 天`}）`
+  $('#detailExamReg').textContent = regRangeText(exam)
+    ? `${regRangeText(exam)}${regStatusText(exam) ? '（' + regStatusText(exam) + '）' : ''}`
     : '未设置';
   const urlEl = $('#detailExamUrl');
   if (exam.url) { urlEl.href = exam.url; urlEl.textContent = exam.url; urlEl.style.display = 'inline-flex'; }
@@ -350,7 +357,8 @@ const openExamModal = (exam) => {
   $('#examEditTitle').textContent = exam ? '编辑考试' : '添加考试';
   $('#examEditName').value = exam ? exam.name : '';
   $('#examEditDate').value = exam ? exam.date : '';
-  $('#examEditRegDate').value = exam ? (exam.regDate || '') : '';
+  $('#examEditRegStart').value = exam ? (exam.registerStart || exam.regDate || '') : '';
+  $('#examEditRegEnd').value = exam ? (exam.registerEnd || '') : '';
   $('#examEditUrl').value = exam ? (exam.url || '') : '';
   $('#examEditType').value = exam ? (exam.type || '其他') : '其他';
   renderExamSubjectInputs(exam ? (exam.subjects || []) : []);
@@ -387,7 +395,8 @@ const addExamSubjectRow = () => {
 const saveExam = () => {
   const name = $('#examEditName').value.trim();
   const date = $('#examEditDate').value;
-  const regDate = $('#examEditRegDate').value;
+  const regStart = $('#examEditRegStart').value;
+  const regEnd = $('#examEditRegEnd').value;
   const url = $('#examEditUrl').value.trim();
   const type = $('#examEditType').value;
   if (!name) { toast('请填写考试名称', 'error'); return; }
@@ -400,7 +409,9 @@ const saveExam = () => {
     if (n) subjects.push({ name: n, duration: d, timeRange: t });
   });
   const payload = { name, date, type, subjects };
-  if (regDate && /^\d{4}-\d{2}-\d{2}$/.test(regDate)) payload.regDate = regDate;
+  if (regStart && /^\d{4}-\d{2}-\d{2}$/.test(regStart)) payload.registerStart = regStart;
+  if (regEnd && /^\d{4}-\d{2}-\d{2}$/.test(regEnd)) payload.registerEnd = regEnd;
+  if (!payload.registerStart && !payload.registerEnd) payload.regDate = '';
   if (url && /^https?:\/\//i.test(url)) payload.url = url;
   if (examEditTarget) {
     Object.assign(examEditTarget, payload);
@@ -1231,6 +1242,7 @@ const renderExamInfoList = () => {
           <span class="info-tag cat">${escapeHtml(item.category || '其他')}</span>
           ${item.subcategory ? `<span class="info-tag sub">${escapeHtml(item.subcategory)}</span>` : ''}
           ${item.date ? `<span class="info-tag date">${escapeHtml(item.date)}</span>` : ''}
+          ${regRangeText(item) ? `<span class="info-tag reg">📝 报名 ${escapeHtml(regRangeText(item))}</span>` : ''}
         </div>
       </div>
       <div class="info-card-body">${escapeHtml(item.content || '').replace(/\n/g, '<br>')}</div>
@@ -1271,6 +1283,8 @@ const openExamInfoModal = (item) => {
   $('#examInfoEditCategory').value = item ? (item.category || '') : '';
   $('#examInfoEditSubcategory').value = item ? (item.subcategory || '') : '';
   $('#examInfoEditDate').value = item ? (item.date || '') : '';
+  $('#examInfoEditRegStart').value = item ? (item.registerStart || item.regDate || '') : '';
+  $('#examInfoEditRegEnd').value = item ? (item.registerEnd || '') : '';
   $('#examInfoEditContent').value = item ? (item.content || '') : '';
   renderExamInfoLinkInputs(item ? (item.links || []) : []);
   const hasTalk = !!(item && item.talk);
@@ -1326,6 +1340,8 @@ const saveExamInfo = () => {
     title, category,
     subcategory: $('#examInfoEditSubcategory').value.trim(),
     date: $('#examInfoEditDate').value,
+    registerStart: $('#examInfoEditRegStart').value || undefined,
+    registerEnd: $('#examInfoEditRegEnd').value || undefined,
     content: $('#examInfoEditContent').value.trim(),
     links,
     talk,
@@ -1484,6 +1500,40 @@ const pomoStart = () => { if (pomoRunning) { clearInterval(pomoTimer); pomoRunni
 const pomoReset = () => { if (pomoRunning && !confirm('正在计时中，确定重置？')) return; clearInterval(pomoTimer); pomoTimer = null; pomoRunning = false; pomoRemaining = pomoSeconds; pomoRender(); };
 const togglePomoPanel = () => { const panel = $('#pomoPanel'); if (panel.hidden) { loadPomoToday(); panel.hidden = false; pomoRender(); } else panel.hidden = true; };
 
+// 番茄钟可整体收起（隐藏悬浮球），避免遮挡内容；状态持久化
+const POMO_HIDDEN_KEY = 'shangan_pomo_hidden';
+const applyPomoHidden = (h) => {
+  $('#pomoFab').hidden = h;
+  if (h) $('#pomoPanel').hidden = true;
+  $('#pomoShow').hidden = !h;
+};
+const togglePomoHidden = () => {
+  const h = !$('#pomoFab').hidden;
+  try { localStorage.setItem(POMO_HIDDEN_KEY, h ? '1' : '0'); } catch (_) {}
+  applyPomoHidden(h);
+};
+
+// 报名时间区间（registerStart ~ registerEnd），兼容旧的单个 regDate
+const regRangeText = (o) => {
+  if (!o) return '';
+  const s = o.registerStart || o.regDate || '', e = o.registerEnd || '';
+  if (s && e) return `${s} 至 ${e}`;
+  if (s) return s;
+  if (e) return e;
+  return '';
+};
+const regStatusText = (o) => {
+  if (!o) return null;
+  const s = o.registerStart || o.regDate || '', e = o.registerEnd || '';
+  if (!s && !e) return null;
+  const t = today();
+  if (e && e < t) return '报名已结束';
+  if (s && s > t) { const d = daysBetween(t, s); return `还有 ${d} 天开始报名`; }
+  if (e && e >= t) { const d = daysBetween(t, e); return `报名中 · 还剩 ${d} 天`; }
+  if (s && s <= t) return '报名进行中';
+  return '';
+};
+
 /* ---------- 头像 / 昵称 ---------- */
 const AVATAR_EMOJIS = ['🐰', '🐱', '🐶', '🦊', '🐼', '🦁', '🐯', '🐨', '🐸', '🐧', '🦉', '🎓'];
 const renderAvatar = (el, size) => {
@@ -1609,6 +1659,8 @@ const bindEvents = () => {
   $('#pomoReset').addEventListener('click', pomoReset);
   $$('.pomo-tab').forEach(t => t.addEventListener('click', () => pomoSetMode(t.dataset.mode)));
   $('#pomoModalOk').addEventListener('click', () => { $('#pomoModal').hidden = true; });
+  $('#pomoHide').addEventListener('click', togglePomoHidden);
+  $('#pomoShow').addEventListener('click', togglePomoHidden);
 
   document.querySelectorAll('input[name="trendMetric"]').forEach(r => r.addEventListener('change', renderTrend));
 
@@ -1933,6 +1985,234 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+/* ====================================================================
+ * 工具合集：4 个小工具（百分化游戏 / 每日时政 / 年均增长率 / 截面图）
+ * ==================================================================== */
+const rnd = (n) => Math.floor(Math.random() * n);
+const pick = (arr) => arr[rnd(arr.length)];
+const shuffle = (arr) => arr.map(x => [Math.random(), x]).sort((a, b) => a[0] - b[0]).map(p => p[1]);
+
+/* ---------- 1) 百分化游戏：分数 → 百分数 四选一 ---------- */
+const toolPercent = { score: 0, total: 0 };
+const nextPercent = () => {
+  const denoms = [2, 4, 5, 8, 10, 20, 25, 40, 50];
+  const d = pick(denoms); const n = 1 + rnd(d - 1);
+  const correct = Math.round(n / d * 1000) / 10;
+  const opts = new Set([correct]);
+  let guard = 0;
+  while (opts.size < 4 && guard++ < 50) {
+    const delta = (1 + rnd(5)) * (Math.random() < 0.5 ? -1 : 1) * 0.1 * 10;
+    const v = Math.round((correct + delta) * 10) / 10;
+    if (v > 0 && v < 100) opts.add(v);
+  }
+  toolPercent.q = `${n}/${d}`;
+  toolPercent.ans = correct;
+  toolPercent.opts = shuffle(Array.from(opts));
+};
+const renderToolPercent = () => {
+  const root = $('#toolPercentRoot'); if (!root) return;
+  nextPercent();
+  root.innerHTML = `<div class="quiz-card">
+    <div class="quiz-stat">答对 <b id="tpScore">${toolPercent.score}</b> / <span id="tpTotal">${toolPercent.total}</span></div>
+    <div class="quiz-q" id="tpQ"></div>
+    <div class="quiz-opts" id="tpOpts"></div>
+    <div class="quiz-fb" id="tpFb"></div>
+    <div class="quiz-actions"><button class="primary-btn" id="tpNext">下一题 →</button></div>
+  </div>`;
+  paintPercent();
+  $('#tpNext').addEventListener('click', () => { nextPercent(); paintPercent(); $('#tpFb').textContent = ''; $('#tpFb').className = 'quiz-fb'; });
+};
+const paintPercent = () => {
+  $('#tpQ').textContent = `将 ${toolPercent.q} 化为百分数（保留一位小数）`;
+  const optsEl = $('#tpOpts');
+  optsEl.innerHTML = toolPercent.opts.map(o => `<button class="quiz-opt" data-v="${o}">${o}%</button>`).join('');
+  optsEl.dataset.done = '';
+  optsEl.querySelectorAll('.quiz-opt').forEach(b => {
+    b.addEventListener('click', () => {
+      if (optsEl.dataset.done) return;
+      optsEl.dataset.done = '1';
+      const v = parseFloat(b.dataset.v);
+      toolPercent.total++;
+      const ok = Math.abs(v - toolPercent.ans) < 1e-9;
+      if (ok) toolPercent.score++;
+      b.classList.add(ok ? 'correct' : 'wrong');
+      optsEl.querySelectorAll('.quiz-opt').forEach(x => { if (parseFloat(x.dataset.v) === toolPercent.ans) x.classList.add('correct'); });
+      $('#tpScore').textContent = toolPercent.score;
+      $('#tpTotal').textContent = toolPercent.total;
+      $('#tpFb').textContent = ok ? '✅ 正确！' : `❌ 正确答案：${toolPercent.ans}%`;
+      $('#tpFb').className = 'quiz-fb ' + (ok ? 'ok' : 'bad');
+    });
+  });
+};
+
+/* ---------- 2) 每日时政：标签筛选 + 收藏 ---------- */
+const POLITICS_ITEMS = [
+  { id: 'p1', date: '2026-09-08', tag: '会议', title: '中共中央政治局召开会议，研究部署下半年经济工作，强调稳中求进、提振内需。' },
+  { id: 'p2', date: '2026-09-07', tag: '科技', title: '我国新一代量子计算原型机取得突破，量子比特数进一步提升。' },
+  { id: 'p3', date: '2026-09-06', tag: '民生', title: '多地出台生育支持政策，扩大普惠托育供给、发放育儿补贴。' },
+  { id: 'p4', date: '2026-09-05', tag: '经济', title: '央行运用结构性货币政策工具，引导金融资源流向科技创新与绿色发展。' },
+  { id: 'p5', date: '2026-09-04', tag: '生态', title: '长江流域重点水域十年禁渔阶段性评估发布，水生生物资源恢复明显。' },
+  { id: 'p6', date: '2026-09-03', tag: '国际', title: '上合组织成员国元首理事会举行，聚焦安全、发展与多边合作。' },
+  { id: 'p7', date: '2026-09-02', tag: '民生', title: '基本医保参保长效机制进一步完善，灵活就业人员参保更便利。' },
+  { id: 'p8', date: '2026-09-01', tag: '科技', title: '国产大飞机新增商业航线，C919 机队规模与运营范围持续扩大。' },
+  { id: 'p9', date: '2026-08-31', tag: '经济', title: '前七月高技术制造业增加值同比增长较快，新动能持续壮大。' },
+  { id: 'p10', date: '2026-08-30', tag: '会议', title: '中央财经委员会会议研究促进共同富裕、优化收入分配格局。' },
+  { id: 'p11', date: '2026-08-29', tag: '生态', title: '全国碳市场扩容，更多高排放行业纳入配额管理。' },
+  { id: 'p12', date: '2026-08-28', tag: '国际', title: '第三届"一带一路"科技交流大会召开，推动创新合作。' },
+];
+const loadPoliticsFav = () => { try { return new Set(JSON.parse(localStorage.getItem('shangan_politics_fav') || '[]')); } catch (_) { return new Set(); } };
+const savePoliticsFav = (set) => { try { localStorage.setItem('shangan_politics_fav', JSON.stringify(Array.from(set))); } catch (_) {} };
+let politicsFilter = '全部';
+const renderToolPolitics = () => {
+  const root = $('#toolPoliticsRoot'); if (!root) return;
+  const tags = ['全部', ...Array.from(new Set(POLITICS_ITEMS.map(i => i.tag)))];
+  const fav = loadPoliticsFav();
+  const list = POLITICS_ITEMS
+    .filter(i => politicsFilter === '全部' || i.tag === politicsFilter)
+    .sort((a, b) => b.date.localeCompare(a.date));
+  root.innerHTML = `
+    <div class="politics-chips">${tags.map(t => `<button class="info-chip ${politicsFilter === t ? 'active' : ''}" data-tag="${t}">${t}</button>`).join('')}</div>
+    <div class="politics-list">${list.map(i => `
+      <div class="politics-item ${fav.has(i.id) ? 'faved' : ''}">
+        <div class="politics-main">
+          <span class="info-tag ${'tg-' + i.tag}">${i.tag}</span>
+          <span class="politics-date">${i.date}</span>
+          <div class="politics-title">${escapeHtml(i.title)}</div>
+        </div>
+        <button class="politics-fav" data-id="${i.id}" title="收藏">${fav.has(i.id) ? '⭐' : '☆'}</button>
+      </div>`).join('')}</div>`;
+  root.querySelectorAll('[data-tag]').forEach(b => b.addEventListener('click', () => { politicsFilter = b.dataset.tag; renderToolPolitics(); }));
+  root.querySelectorAll('.politics-fav').forEach(b => b.addEventListener('click', () => {
+    const f = loadPoliticsFav();
+    if (f.has(b.dataset.id)) f.delete(b.dataset.id); else f.add(b.dataset.id);
+    savePoliticsFav(f); renderToolPolitics();
+  }));
+};
+
+/* ---------- 3) 年均增长率练习：r = (B/A)^(1/n) − 1 四选一 ---------- */
+const toolGrowth = { score: 0, total: 0 };
+const renderToolGrowth = () => {
+  const root = $('#toolGrowthRoot'); if (!root) return;
+  const A = pick([120, 150, 200, 240, 300, 360, 480, 500, 640, 800]);
+  const n = pick([2, 3, 4, 5]);
+  const rPct = pick([5, 6, 8, 10, 12, 15, 18, 20]);
+  const r = rPct / 100;
+  const B = Math.round(A * Math.pow(1 + r, n));
+  const correct = rPct;
+  const opts = new Set([correct]);
+  let guard = 0;
+  while (opts.size < 4 && guard++ < 50) {
+    const v = pick([3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 25]);
+    if (v !== correct) opts.add(v);
+  }
+  const optArr = shuffle(Array.from(opts));
+  root.innerHTML = `<div class="quiz-card">
+    <div class="quiz-stat">答对 <b id="tgScore">${toolGrowth.score}</b> / <span id="tgTotal">${toolGrowth.total}</span></div>
+    <div class="quiz-q">基期 ${A}，现期 ${B}，间隔 ${n} 年。<br>求年均增长率 r = (B/A)<sup>1/${n}</sup> − 1（精确到整数百分比）</div>
+    <div class="quiz-opts" id="tgOpts">${optArr.map(o => `<button class="quiz-opt" data-v="${o}">${o}%</button>`).join('')}</div>
+    <div class="quiz-fb" id="tgFb"></div>
+    <div class="quiz-actions"><button class="primary-btn" id="tgNext">下一题 →</button></div>
+  </div>`;
+  const optsEl = $('#tgOpts');
+  optsEl.dataset.done = '';
+  optsEl.querySelectorAll('.quiz-opt').forEach(b => {
+    b.addEventListener('click', () => {
+      if (optsEl.dataset.done) return;
+      optsEl.dataset.done = '1';
+      const v = parseInt(b.dataset.v, 10);
+      toolGrowth.total++;
+      const ok = v === correct;
+      if (ok) toolGrowth.score++;
+      b.classList.add(ok ? 'correct' : 'wrong');
+      optsEl.querySelectorAll('.quiz-opt').forEach(x => { if (parseInt(x.dataset.v, 10) === correct) x.classList.add('correct'); });
+      $('#tgScore').textContent = toolGrowth.score;
+      $('#tgTotal').textContent = toolGrowth.total;
+      const real = (Math.pow(B / A, 1 / n) - 1) * 100;
+      $('#tgFb').textContent = ok ? '✅ 正确！' : `❌ 正确答案：${correct}%（实际约 ${real.toFixed(1)}%）`;
+      $('#tgFb').className = 'quiz-fb ' + (ok ? 'ok' : 'bad');
+    });
+  });
+  $('#tgNext').addEventListener('click', renderToolGrowth);
+};
+
+/* ---------- 4) 截面图练习：立体图形截面可视化 + 四选一 ---------- */
+const SECTION_PUZZLES = [
+  { type: 'cylinder', name: '圆柱', cut: '水平', ans: '圆' },
+  { type: 'cylinder', name: '圆柱', cut: '竖直', ans: '矩形' },
+  { type: 'cone', name: '圆锥', cut: '水平', ans: '圆' },
+  { type: 'cone', name: '圆锥', cut: '过顶点竖直', ans: '三角形' },
+  { type: 'sphere', name: '球体', cut: '任意', ans: '圆' },
+  { type: 'cube', name: '正方体', cut: '水平', ans: '正方形' },
+  { type: 'cube', name: '正方体', cut: '竖直', ans: '矩形' },
+  { type: 'triPrism', name: '三棱柱', cut: '水平', ans: '三角形' },
+];
+const SHAPE_POOL = ['圆', '椭圆', '矩形', '正方形', '三角形', '梯形'];
+const drawSolid = (canvas, type) => {
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#eaf4ff'; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = '#3a6ea5'; ctx.fillStyle = '#cfe6ff'; ctx.lineWidth = 2;
+  const cx = W / 2;
+  if (type === 'cylinder') {
+    const top = 40, bot = 140, rx = 55, ry = 18;
+    ctx.beginPath(); ctx.ellipse(cx, top, rx, ry, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx - rx, top); ctx.lineTo(cx - rx, bot); ctx.moveTo(cx + rx, top); ctx.lineTo(cx + rx, bot); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(cx, bot, rx, ry, 0, 0, Math.PI); ctx.fill(); ctx.stroke();
+  } else if (type === 'cone') {
+    const top = 35, bot = 145, rx = 55, ry = 16;
+    ctx.beginPath(); ctx.moveTo(cx, top); ctx.lineTo(cx - rx, bot); ctx.lineTo(cx + rx, bot); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(cx, bot, rx, ry, 0, 0, Math.PI); ctx.fill(); ctx.stroke();
+  } else if (type === 'sphere') {
+    const c = cx, cy = 90, r = 58;
+    const g = ctx.createRadialGradient(c - 18, cy - 18, 8, c, cy, r);
+    g.addColorStop(0, '#eaf6ff'); g.addColorStop(1, '#9cc6f0');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(c, cy, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  } else if (type === 'cube') {
+    const x = 70, y = 45, s = 90, d = 28;
+    ctx.beginPath(); ctx.rect(x, y, s, s); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + d, y - d); ctx.lineTo(x + d + s, y - d); ctx.lineTo(x + s, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + s, y); ctx.lineTo(x + s + d, y - d); ctx.lineTo(x + s + d, y - d + s); ctx.lineTo(x + s, y + s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + d, y - d); ctx.lineTo(x + d, y - d + s); ctx.lineTo(x + s, y + s); ctx.stroke();
+  } else if (type === 'triPrism') {
+    const x = 70, y = 60, w = 90, h = 80, d = 30;
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w / 2, y - h / 2); ctx.lineTo(x + w, y); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + 70); ctx.lineTo(x + w, y + 70); ctx.lineTo(x + w, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + w, y); ctx.lineTo(x + w + d, y - d); ctx.lineTo(x + w + d, y + 70 - d); ctx.lineTo(x + w, y + 70); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + w / 2, y - h / 2); ctx.lineTo(x + w / 2 + d, y - h / 2 - d); ctx.lineTo(x + w + d, y - d); ctx.stroke();
+  }
+};
+const renderToolSection = () => {
+  const root = $('#toolSectionRoot'); if (!root) return;
+  const p = pick(SECTION_PUZZLES);
+  const distract = shuffle(SHAPE_POOL.filter(s => s !== p.ans)).slice(0, 3);
+  const opts = shuffle([p.ans, ...distract]);
+  root.innerHTML = `<div class="quiz-card">
+    <div class="quiz-q">对该<b>${p.name}</b>做<b>${p.cut}</b>截面，得到的截面形状是？</div>
+    <div class="section-canvas-wrap"><canvas id="secCanvas" width="240" height="180"></canvas></div>
+    <div class="quiz-opts" id="secOpts">${opts.map(o => `<button class="quiz-opt" data-v="${o}">${o}</button>`).join('')}</div>
+    <div class="quiz-fb" id="secFb"></div>
+    <div class="quiz-actions"><button class="primary-btn" id="secNext">下一题 →</button></div>
+  </div>`;
+  const canvas = $('#secCanvas');
+  if (canvas) drawSolid(canvas, p.type);
+  const optsEl = $('#secOpts');
+  optsEl.dataset.done = '';
+  optsEl.querySelectorAll('.quiz-opt').forEach(b => {
+    b.addEventListener('click', () => {
+      if (optsEl.dataset.done) return;
+      optsEl.dataset.done = '1';
+      const v = b.dataset.v;
+      const ok = v === p.ans;
+      b.classList.add(ok ? 'correct' : 'wrong');
+      optsEl.querySelectorAll('.quiz-opt').forEach(x => { if (x.dataset.v === p.ans) x.classList.add('correct'); });
+      $('#secFb').textContent = ok ? '✅ 正确！' : `❌ 正确答案：${p.ans}`;
+      $('#secFb').className = 'quiz-fb ' + (ok ? 'ok' : 'bad');
+    });
+  });
+  $('#secNext').addEventListener('click', renderToolSection);
+};
+
 /* ---------- 启动 ---------- */
 const init = () => {
   loadState();
@@ -1947,6 +2227,18 @@ const init = () => {
   applyNavMode();
   applyFont();
   renderTopbar();
+  // 番茄钟收起状态（持久化）
+  try { applyPomoHidden(localStorage.getItem(POMO_HIDDEN_KEY) === '1'); } catch (_) {}
+  // 外部链接统一新标签打开，避免 PWA 内跳转后无法返回
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if (/^https?:\/\//i.test(href)) {
+      e.preventDefault();
+      window.open(href, '_blank', 'noopener,noreferrer');
+    }
+  }, true);
   const hash = location.hash.replace('#', '');
   navigate(ROUTES.includes(hash) ? hash : 'home');
 };

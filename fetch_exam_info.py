@@ -76,6 +76,19 @@ CAT_KEYWORDS = ['上海', '湖北', '河南', '北京', '广东', '浙江', '江
 
 SUB_KEYWORDS = ['选调', '省考', '市考', '国考', '公务员', '事业单位', '宣讲会']
 
+# 只保留该日期之后的公告（2026 下半年及以后的招录季，过滤上半年过期旧公告）
+CUTOFF = "2026-07-01"
+
+def _is_stale(item):
+    """跳过汇总聚合卡与过期旧公告。"""
+    title = item.get('title', '')
+    if '汇总' in title:
+        return True
+    d = item.get('date', '')
+    if d and d < CUTOFF:
+        return True
+    return False
+
 
 class _Stripper(HTMLParser):
     def __init__(self):
@@ -278,9 +291,13 @@ def build(pages):
     # 去重（按 id）
     seen, uniq = set(), []
     for it in result:
-        if it['id'] not in seen:
-            seen.add(it['id'])
-            uniq.append(it)
+        if it['id'] in seen:
+            continue
+        seen.add(it['id'])
+        if _is_stale(it):
+            print(f"· 跳过过期/聚合项：{it.get('title', it['id'])}")
+            continue
+        uniq.append(it)
 
     return {
         "_generated_at": datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M'),
