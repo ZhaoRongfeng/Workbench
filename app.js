@@ -1296,6 +1296,15 @@ const openExamInfoModal = (item) => {
   $('#examInfoEditModal').hidden = false;
 };
 
+/* ---------- 外部链接确认 ---------- */
+let externalLinkTargetUrl = '';
+const openExternalLink = (url) => {
+  if (!url || !/^https?:\/\//i.test(url)) return;
+  externalLinkTargetUrl = url;
+  $('#externalLinkUrl').textContent = url;
+  $('#externalLinkModal').hidden = false;
+};
+
 const renderExamInfoLinkInputs = (links) => {
   const wrap = $('#examInfoLinkList');
   wrap.innerHTML = (links || []).map((l, i) => `
@@ -1678,6 +1687,26 @@ const bindEvents = () => {
   $('#examInfoEditSave').addEventListener('click', saveExamInfo);
   $('#examInfoAddLinkBtn').addEventListener('click', addExamInfoLinkRow);
   $('#examInfoHasTalk').addEventListener('change', (e) => { $('#examInfoTalkFields').hidden = !e.target.checked; });
+
+  // 外部链接确认弹窗(避免 PWA 里直接跳走后找不到返回入口)
+  $('#externalLinkCancel').addEventListener('click', () => { $('#externalLinkModal').hidden = true; externalLinkTargetUrl = ''; });
+  $('#externalLinkOpen').addEventListener('click', () => {
+    if (externalLinkTargetUrl) {
+      const w = window.open(externalLinkTargetUrl, '_blank', 'noopener,noreferrer');
+      if (!w) toast('浏览器拦截了弹窗，请从最近任务切回后重试', 'error');
+    }
+    $('#externalLinkModal').hidden = true;
+  });
+  $('#examInfoList').addEventListener('click', (e) => {
+    const a = e.target.closest('.info-link');
+    if (!a) return;
+    e.preventDefault();
+    openExternalLink(a.href);
+  });
+  $('#detailExamUrl').addEventListener('click', (e) => {
+    e.preventDefault();
+    openExternalLink($('#detailExamUrl').href);
+  });
 
   const pickAvatar = (inputId) => { const el = $(inputId); if (el) el.click(); };
   $('#avatarWrap').addEventListener('click', () => pickAvatar('#avatarInput'));
