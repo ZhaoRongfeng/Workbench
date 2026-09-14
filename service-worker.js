@@ -1,5 +1,5 @@
 /* 备考兔 · 上岸工作台 — Service Worker（离线缓存 + 加到主屏） */
-const CACHE = 'shangan-v3.5';
+const CACHE = 'shangan-v3.6';
 const ASSETS = [
   './',
   './index.html',
@@ -33,6 +33,24 @@ self.addEventListener('activate', (e) => {
 /* 缓存优先（stale-while-revalidate）：离线可用，联网时静默更新 */
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+
+  // 考试汇总 JSON：网络优先，保证每日抓取到的最新公告不被 PWA 缓存成旧数据
+  const url = new URL(e.request.url);
+  if (url.pathname.endsWith('.json')) {
+    e.respondWith(
+      fetch(e.request)
+        .then((res) => {
+          if (res && res.status === 200 && res.type === 'basic') {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(e.request, copy));
+          }
+          return res;
+        })
+        .catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
   e.respondWith(
     caches.match(e.request).then((cached) => {
       const network = fetch(e.request)

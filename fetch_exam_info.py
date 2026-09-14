@@ -39,7 +39,7 @@ BASE_TJ = "https://tj91.tongji.edu.cn"
 FIXED_SOURCES = [
     {
         "id": "info-shanghai-xuandiao-2026",
-        "title": "2026上海市选调公告",
+        "title": "2027上海市选调公告",
         "category": "上海",
         "subcategory": "选调",
         "url": "https://shacs.gov.cn/",
@@ -47,7 +47,7 @@ FIXED_SOURCES = [
     },
     {
         "id": "info-guokao-2026",
-        "title": "2026年度国考公告",
+        "title": "2027年度国考公告",
         "category": "国考",
         "subcategory": "国考",
         "url": "http://www.scs.gov.cn/gkIndex.html",
@@ -55,7 +55,7 @@ FIXED_SOURCES = [
     },
     {
         "id": "info-hubei-xuandiao-2026",
-        "title": "2026湖北省选调公告",
+        "title": "2027湖北省选调公告",
         "category": "湖北",
         "subcategory": "选调",
         "url": "http://www.hbsrsksy.cn/",
@@ -63,7 +63,7 @@ FIXED_SOURCES = [
     },
     {
         "id": "info-henan-shengkao-2026",
-        "title": "2026河南省考公告",
+        "title": "2027河南省考公告",
         "category": "河南",
         "subcategory": "省考",
         "url": "http://www.hnrsks.com/sitesources/hnsrskszx/page_pc/ksxxnew/index.html",
@@ -77,7 +77,7 @@ CAT_KEYWORDS = ['上海', '湖北', '河南', '北京', '广东', '浙江', '江
 SUB_KEYWORDS = ['选调', '省考', '市考', '国考', '公务员', '事业单位', '宣讲会']
 
 # 只保留该日期之后的公告（2026 下半年及以后的招录季，过滤上半年过期旧公告）
-CUTOFF = "2026-07-01"
+CUTOFF = "2026-09-01"
 
 def _is_stale(item):
     """跳过汇总聚合卡与过期旧公告。"""

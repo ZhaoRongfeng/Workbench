@@ -68,6 +68,8 @@ const toast = (msg, type = 'info') => {
 const defaultState = () => ({
   exams: [...DEFAULT_EXAMS],
   examInfo: typeof DEFAULT_EXAM_INFO !== 'undefined' ? [...DEFAULT_EXAM_INFO] : [],
+  examInfoDeleted: [],        // 用户手动删除的远程条目 id（同步时不再复活）
+  examInfoEdited: [],         // 用户手动改过的远程条目 id（同步时不覆盖）
   plans: [],
   checkins: {},
   stats: [],
@@ -101,6 +103,8 @@ const loadState = () => {
       politicsPast: parsed.politicsPast || [],
       studyPlan: parsed.studyPlan || {},
       examInfo: parsed.examInfo || defaultState().examInfo,
+      examInfoDeleted: parsed.examInfoDeleted || [],
+      examInfoEdited: parsed.examInfoEdited || [],
       sync: parsed.sync || {},
       meta: { ...defaultState().meta, ...(parsed.meta || {}) } };
     // 旧考试数据迁移：补齐 type / subjects
@@ -1265,7 +1269,12 @@ const renderExamInfoList = () => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       if (!confirm('确定删除该条信息？')) return;
-      state.examInfo = state.examInfo.filter(i => i.id !== btn.dataset.delInfo);
+      const delId = btn.dataset.delInfo;
+      state.examInfo = state.examInfo.filter(i => i.id !== delId);
+      if (!delId.startsWith('info_')) {                 // 远程条目：记入删除集，避免同步复活
+        state.examInfoDeleted = state.examInfoDeleted || [];
+        if (!state.examInfoDeleted.includes(delId)) state.examInfoDeleted.push(delId);
+      }
       saveState(); renderExamInfo(); toast('已删除');
     });
   });
@@ -1362,6 +1371,10 @@ const saveExamInfo = () => {
   };
   if (examInfoEditTarget) {
     Object.assign(examInfoEditTarget, payload);
+    if (!examInfoEditTarget.id.startsWith('info_')) {   // 远程条目被手动改过：记入编辑集，同步时不覆盖
+      state.examInfoEdited = state.examInfoEdited || [];
+      if (!state.examInfoEdited.includes(examInfoEditTarget.id)) state.examInfoEdited.push(examInfoEditTarget.id);
+    }
     toast('已保存');
   } else {
     payload.id = 'info_' + Date.now();
@@ -1397,6 +1410,53 @@ const importExamInfo = (file) => {
     } catch (err) { toast('导入失败：' + err.message, 'error'); }
   };
   reader.readAsText(file);
+};
+
+/* ---------- 每日自动同步（GitHub Actions 生成的 exam_info.json） ---------- */
+// 合并策略：
+//   · 远程条目按 id 覆盖本地同名条目（内容/日期/链接每日刷新）
+//   · 用户手动改过的远程条目（examInfoEdited）保留用户的版本
+//   · 用户手动删过的远程条目（examInfoDeleted）不再复活
+//   · 用户自己新增的条目（id 以 info_ 开头且不在远程）始终保留
+let _examInfoSyncing = false;
+const syncExamInfoFromRemote = async () => {
+  if (location.protocol === 'file:') return;       // 本地文件无法 fetch
+  if (_examInfoSyncing) return;
+  _examInfoSyncing = true;
+  const btn = document.getElementById('syncExamInfoBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '🔄 同步中…'; }
+  try {
+    const res = await fetch('./exam_info.json', { cache: 'no-store' });
+    if (!res.ok) return;
+    const remote = await res.json();
+    if (!Array.isArray(remote) || !remote.length) return;
+
+    const deleted = new Set(state.examInfoDeleted || []);
+    const edited = new Set(state.examInfoEdited || []);
+    const remoteIds = new Set(remote.map(i => i.id));
+    const curMap = new Map((state.examInfo || []).map(i => [i.id, i]));
+
+    const next = [];
+    remote.forEach(r => {
+      if (deleted.has(r.id)) return;                                  // 用户删过 → 不复活
+      if (edited.has(r.id) && curMap.has(r.id)) next.push(curMap.get(r.id)); // 用户改过 → 用本地版
+      else next.push(r);                                             // 否则用远程最新版
+    });
+    // 保留用户自己新增的条目
+    (state.examInfo || []).forEach(i => {
+      if (i.id && i.id.startsWith('info_') && !remoteIds.has(i.id)) next.push(i);
+    });
+
+    state.examInfo = next;
+    saveState();
+    if (typeof renderExamInfo === 'function') renderExamInfo();
+    toast('已同步最新考试公告');
+  } catch (e) {
+    console.warn('考试汇总同步失败（离线或网络异常）', e);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '🔄 同步最新'; }
+    _examInfoSyncing = false;
+  }
 };
 
 /* ---------- 错题库导出 ---------- */
@@ -1686,6 +1746,7 @@ const bindEvents = () => {
   $('#addExamInfoBtn').addEventListener('click', () => openExamInfoModal(null));
   $('#examInfoSearch').addEventListener('input', (e) => { examInfoFilter.q = e.target.value; renderExamInfoList(); });
   $('#exportExamInfoBtn').addEventListener('click', exportExamInfo);
+  $('#syncExamInfoBtn').addEventListener('click', () => { syncExamInfoFromRemote(); });
   $('#importExamInfoBtn').addEventListener('click', () => $('#importExamInfoFile').click());
   $('#importExamInfoFile').addEventListener('change', (e) => { const f = e.target.files[0]; if (f) importExamInfo(f); e.target.value = ''; });
   $('#examInfoEditCancel').addEventListener('click', () => $('#examInfoEditModal').hidden = true);
@@ -2552,6 +2613,9 @@ const init = () => {
   try { applyPomoHidden(localStorage.getItem(POMO_HIDDEN_KEY) === '1'); } catch (_) {}
   const hash = location.hash.replace('#', '');
   navigate(ROUTES.includes(hash) ? hash : 'home');
+
+  // 启动时自动同步一次最新考试公告（每日由 GitHub Actions 刷新）
+  syncExamInfoFromRemote();
 };
 
 document.addEventListener('DOMContentLoaded', () => {
