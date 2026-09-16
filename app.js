@@ -2094,7 +2094,7 @@ const PCF_TABLE = [
     ['1/5.3', '19%'], ['1/5.6', '18%'], ['1/5.9', '17%'],
   ] },
   { group: 'green', label: '母子互换', items: [
-    ['1/6', '16.7%'], ['1/7', '14.3%'], ['1/14', '7.1%'], ['1/15', '6.7%'], ['1/16', '6.25%'],
+    ['1/6', '16.7%'], ['1/7', '14.3%'], ['2/7', '28.6%'], ['3/7', '42.9%'], ['1/14', '7.1%'], ['1/15', '6.7%'], ['1/16', '6.25%'],
     ['1/6.5', '15.4%'], ['1/7.5', '13.3%'],
   ] },
   { group: 'red', label: '加和为 20', items: [
@@ -2119,6 +2119,15 @@ const PCF_FREE_SIZES = [{ rows: 4, cols: 4 }, { rows: 4, cols: 5 }, { rows: 4, c
 const PCF_CHALLENGE_HINTS = 3;
 const PCF_FREE_HINTS = 5;
 const PCF_LEVEL_LS = 'shangan_pcf_level';
+const PCF_DICT_LS = 'shangan_pcf_dict';
+
+/* 默写模式：每日一遍百化分，按天轮换提问方向
+   pattern 0：分数→百分数（如 1/2 = ___）
+   pattern 1：百分数→分数（如 50% = ___）
+   pattern 2：混合（逐题随机方向）
+   用 dayOfYear + 1 作偏移，使 2026-09-17 起为 pattern 0 */
+const pcfDictPattern = () => ((dayOfYear(today()) + 1) % 3 + 3) % 3;
+const pcfDictPatternName = (p) => ['分数 → 百分数', '百分数 → 分数', '混合模式'][p] || '混合模式';
 
 const pcf = {
   screen: 'menu', mode: 'study',
@@ -2126,6 +2135,16 @@ const pcf = {
   matched: 0, totalPairs: 0, hintsLeft: Infinity,
   elapsed: 0, timeLimit: 0, remain: 0,
   paused: false, locked: false, level: 1, timerId: null,
+};
+
+/* 默写模式状态（每日独立） */
+let pcfDict = {
+  date: '',           // 当天的日期字符串
+  pattern: 0,         // 0分数→百分数 / 1百分数→分数 / 2混合
+  items: [],          // {frac,pct,prompt,answer,askFrac,input,correct,tried}
+  idx: 0,             // 当前做到第几题
+  score: 0,           // 当前答对数
+  done: false,        // 是否已完成
 };
 
 const fmtMS = (s) => {
@@ -2214,6 +2233,150 @@ const openPcfFreePicker = () => {
       startPcfGame('free', { rows: +b.dataset.r, cols: +b.dataset.c });
     }));
   });
+};
+
+/* ---------- 默写模式 ---------- */
+const normalizePctAnswer = (s) => String(s || '').trim().replace(/\s+/g, '').replace(/%/g, '').replace(/％/g, '');
+const normalizeFracAnswer = (s) => String(s || '').trim().replace(/\s+/g, '').replace(/\//g, '/').replace(/／/g, '/').replace(/∕/g, '/');
+
+const pcfDictLoad = () => {
+  try {
+    const raw = localStorage.getItem(PCF_DICT_LS);
+    if (raw) pcfDict = { ...pcfDict, ...JSON.parse(raw) };
+  } catch (_) {}
+};
+const pcfDictSave = () => {
+  try { localStorage.setItem(PCF_DICT_LS, JSON.stringify(pcfDict)); } catch (_) {}
+};
+
+const pcfDictBuildItems = () => {
+  const pattern = pcfDictPattern();
+  const items = shuffle(PCF_POOL.slice()).map(({ frac, pct }) => {
+    let askFrac;
+    if (pattern === 0) askFrac = true;          // 分数 → 百分数
+    else if (pattern === 1) askFrac = false;     // 百分数 → 分数
+    else askFrac = Math.random() > 0.5;          // 混合
+    return {
+      frac, pct,
+      prompt: askFrac ? frac : pct,
+      answer: askFrac ? normalizePctAnswer(pct) : normalizeFracAnswer(frac),
+      askFrac,
+      input: '',
+      correct: false,
+      tried: false,
+    };
+  });
+  pcfDict = { date: today(), pattern, items, idx: 0, score: 0, done: false };
+  pcfDictSave();
+};
+
+const startPcfDict = () => {
+  pcfDictLoad();
+  if (pcfDict.date !== today()) pcfDictBuildItems();
+  else if (!pcfDict.items.length) pcfDictBuildItems();
+  pcf.screen = 'dict';
+  closePcfOverlay();
+  renderPcfDict();
+};
+
+const renderPcfDict = () => {
+  const root = $('#toolPercentRoot'); if (!root) return;
+  const cur = pcfDict.items[pcfDict.idx];
+  const total = pcfDict.items.length;
+  const progress = total ? Math.round((pcfDict.idx / total) * 100) : 0;
+  if (!cur || pcfDict.done) {
+    pcfDictFinish();
+    return;
+  }
+  root.innerHTML = `
+    <div class="pcf-dict">
+      <div class="pcf-hud">
+        <span class="pcf-hud-mode">✍️ 默写模式 · ${pcfDictPatternName(pcfDict.pattern)}</span>
+        <span class="pcf-hud-info">第 ${pcfDict.idx + 1} / ${total} 题 · 已答对 ${pcfDict.score} 题</span>
+      </div>
+      <div class="pcf-dict-progress"><div class="pcf-dict-bar" style="width:${progress}%"></div></div>
+      <div class="pcf-dict-card">
+        <div class="pcf-dict-q">${escapeHtml(cur.prompt)} <span class="pcf-dict-eq">=</span></div>
+        <div class="pcf-dict-input-wrap">
+          <input type="text" inputmode="text" class="pcf-dict-input" id="pcfDictInput" value="${escapeAttr(cur.input)}" placeholder="在此输入答案" autocomplete="off">
+        </div>
+        <div class="pcf-dict-tip" id="pcfDictTip"></div>
+      </div>
+      <div class="pcf-dict-actions">
+        <button type="button" class="primary-btn" id="pcfDictSubmit">提交答案</button>
+        <button type="button" class="ghost-btn" id="pcfDictSkip">跳过</button>
+        <button type="button" class="ghost-btn" id="pcfDictExit">返回</button>
+      </div>
+      <div class="pcf-dict-hint">提示：直接按回车即可提交；建议填写与百化分表中完全一致的形式。</div>
+    </div>`;
+  const input = $('#pcfDictInput');
+  input.focus();
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkPcfDict(); });
+  $('#pcfDictSubmit').addEventListener('click', checkPcfDict);
+  $('#pcfDictSkip').addEventListener('click', () => {
+    pcfDict.idx = Math.min(pcfDict.items.length, pcfDict.idx + 1);
+    pcfDictSave(); renderPcfDict();
+  });
+  $('#pcfDictExit').addEventListener('click', () => { pcf.screen = 'menu'; renderToolPercent(); });
+};
+
+const checkPcfDict = () => {
+  const cur = pcfDict.items[pcfDict.idx];
+  if (!cur) return;
+  const inputEl = $('#pcfDictInput');
+  const raw = inputEl.value;
+  const val = cur.askFrac ? normalizePctAnswer(raw) : normalizeFracAnswer(raw);
+  cur.input = raw;
+  cur.tried = true;
+  const tip = $('#pcfDictTip');
+  if (val === cur.answer) {
+    cur.correct = true;
+    pcfDict.score++;
+    tip.className = 'pcf-dict-tip ok';
+    tip.innerHTML = `✅ 正确！<b>${escapeHtml(cur.prompt)} = ${escapeHtml(cur.askFrac ? cur.pct : cur.frac)}</b>`;
+  } else {
+    tip.className = 'pcf-dict-tip bad';
+    tip.innerHTML = `❌ 正确答案：<b>${escapeHtml(cur.prompt)} = ${escapeHtml(cur.askFrac ? cur.pct : cur.frac)}</b>`;
+  }
+  inputEl.disabled = true;
+  $('#pcfDictSubmit').disabled = true;
+  $('#pcfDictSkip').textContent = '下一题 →';
+  $('#pcfDictSkip').focus();
+  pcfDictSave();
+  // 自动进入下一题
+  setTimeout(() => {
+    pcfDict.idx = Math.min(pcfDict.items.length, pcfDict.idx + 1);
+    if (pcfDict.idx >= pcfDict.items.length) pcfDict.done = true;
+    pcfDictSave();
+    renderPcfDict();
+  }, 900);
+};
+
+const pcfDictFinish = () => {
+  const root = $('#toolPercentRoot'); if (!root) return;
+  const total = pcfDict.items.length;
+  const wrong = pcfDict.items.filter(i => !i.correct);
+  const perfect = wrong.length === 0;
+  root.innerHTML = `
+    <div class="pcf-dict-result">
+      <div class="pcf-dict-result-ico">${perfect ? '🎉' : '✍️'}</div>
+      <div class="pcf-dict-result-title">${perfect ? '全对啦，百化分已刻进 DNA！' : '今日默写完成'}</div>
+      <div class="pcf-dict-result-score">${pcfDict.score} / ${total}</div>
+      <div class="pcf-dict-result-sub">${wrong.length ? `错了 ${wrong.length} 题，已标红，建议再默写一遍` : '明天继续加油 ✨'}</div>
+      ${wrong.length ? `<div class="pcf-dict-wrong"><b>错题回顾</b>${wrong.map(i => `
+        <div class="pcf-dict-wrong-row"><span>${escapeHtml(i.prompt)}</span><span>${escapeHtml(i.askFrac ? i.pct : i.frac)}</span></div>`).join('')}</div>` : ''}
+      <div class="pcf-dict-result-actions">
+        <button type="button" class="primary-btn" id="pcfDictReplay">再来一遍</button>
+        <button type="button" class="ghost-btn" id="pcfDictBackMenu">返回</button>
+      </div>
+    </div>`;
+  $('#pcfDictReplay').addEventListener('click', pcfDictReset);
+  $('#pcfDictBackMenu').addEventListener('click', () => { pcf.screen = 'menu'; renderToolPercent(); });
+};
+
+const pcfDictReset = () => {
+  pcfDictBuildItems();
+  renderPcfDict();
 };
 
 /* ---------- 开局 / 渲染 ---------- */
@@ -2397,11 +2560,22 @@ const pcfResult = (win) => {
 const renderToolPercent = () => {
   const root = $('#toolPercentRoot'); if (!root) return;
   if (pcf.screen === 'game' && pcf.board.length) { renderPcfGame(); resumePcfTimer(); return; }
+  if (pcf.screen === 'dict') {
+    pcfDictLoad();
+    if (pcfDict.date === today() && pcfDict.items.length && !pcfDict.done) { renderPcfDict(); return; }
+    if (pcfDict.date === today() && pcfDict.done) { pcfDictFinish(); return; }
+  }
   pcf.screen = 'menu';
   const best = pcfBestLevel();
   const cleared = Math.min(PCF_LEVELS.length, Math.max(0, pcfBestLevel() - 1));
+  const todayPat = pcfDictPattern();
+  const patText = ['今日：分数→百分数', '今日：百分数→分数', '今日：混合'][todayPat];
   root.innerHTML = `
     <div class="pcf-modes">
+      <button type="button" class="pcf-mode-card pink" data-mode="dictation">
+        <span class="pcf-mode-ico">✍️</span>
+        <span class="pcf-mode-txt"><b>默写模式</b><em>每日一遍百化分 · ${patText} · 共 ${PCF_POOL.length} 题</em></span>
+      </button>
       <button type="button" class="pcf-mode-card orange" data-mode="study">
         <span class="pcf-mode-ico">📖</span>
         <span class="pcf-mode-txt"><b>学习模式</b><em>自由练习，提示次数不限，成绩不计入排行榜</em></span>
@@ -2420,7 +2594,8 @@ const renderToolPercent = () => {
     </div>`;
   root.querySelectorAll('.pcf-mode-card').forEach(b => b.addEventListener('click', () => {
     const mode = b.dataset.mode;
-    if (mode === 'free') openPcfFreePicker();
+    if (mode === 'dictation') startPcfDict();
+    else if (mode === 'free') openPcfFreePicker();
     else if (mode === 'challenge') openPcfChallenge();
     else startPcfGame('study');
   }));
