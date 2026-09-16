@@ -179,7 +179,7 @@ const ROUTES = [
   'politics', 'common-sense', 'language', 'logic',
   'quantity', 'data-analysis', 'stats',
   'shenlun-small', 'shenlun-big', 'errors', 'exam-info',
-  'tool-percent', 'tool-politics', 'tool-growth', 'tool-section'
+  'tool-percent', 'tool-politics', 'tool-growth', 'tool-section', 'tool-square'
 ];
 const MODULE_ROUTES = ['politics','common-sense','language','logic','quantity','data-analysis','shenlun-small','shenlun-big'];
 const ROUTE_CAT = {
@@ -190,8 +190,9 @@ const COURSE_FOR_ROUTE = { 'politics':'politics','common-sense':'commonSense','l
 
 const navigate = (route) => {
   if (!ROUTES.includes(route)) route = 'home';
-  // 离开百分化游戏时停表并收起弹层（保留进度，回来可继续）
+  // 离开百分化 / 平方数游戏时停表并收起弹层（保留进度，回来可继续）
   if (route !== 'tool-percent') { try { stopPcfTimer(); closePcfOverlay(); } catch (_) {} }
+  if (route !== 'tool-square') { try { stopSqTimer(); closePcfOverlay(); } catch (_) {} }
   $$('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.route === route));
   $$('.view').forEach(v => v.classList.toggle('active', v.dataset.view === route));
   onEnter(route);
@@ -220,6 +221,7 @@ const onEnter = (route) => {
     case 'tool-politics': renderToolPolitics(); break;
     case 'tool-growth': renderToolGrowth(); break;
     case 'tool-section': renderToolSection(); break;
+    case 'tool-square': renderToolSquare(); break;
   }
   if (MODULE_ROUTES.includes(route)) renderModuleHeader(route);
 };
@@ -2608,7 +2610,482 @@ const renderToolPercent = () => {
   $('#pcfTableBtn2').addEventListener('click', openPcfTable);
 };
 
-/* ---------- 2) 每日时政：标签筛选 + 收藏 ---------- */
+/* ---------- 2) 平方数游戏：学习 / 闯关 / 自由 / 默写 ---------- */
+/* 常用平方数表（11² ~ 30²） */
+const SQ_TABLE = [
+  ['11²', '121'], ['12²', '144'], ['13²', '169'], ['14²', '196'], ['15²', '225'],
+  ['16²', '256'], ['17²', '289'], ['18²', '324'], ['19²', '361'], ['20²', '400'],
+  ['21²', '441'], ['22²', '484'], ['23²', '529'], ['24²', '576'], ['25²', '625'],
+  ['26²', '676'], ['27²', '729'], ['28²', '784'], ['29²', '841'], ['30²', '900'],
+];
+const SQ_POOL = SQ_TABLE.map(([base, square]) => ({ base, square }));
+
+/* 闯关模式：15 关 · 三种棋盘（4×4 / 4×6 / 6×6），限时递减 */
+const SQ_LEVELS = [
+  { rows: 4, cols: 4, time: 100 }, { rows: 4, cols: 4, time: 90 }, { rows: 4, cols: 4, time: 80 },
+  { rows: 4, cols: 4, time: 70 }, { rows: 4, cols: 4, time: 60 },
+  { rows: 4, cols: 6, time: 140 }, { rows: 4, cols: 6, time: 125 }, { rows: 4, cols: 6, time: 110 },
+  { rows: 4, cols: 6, time: 95 }, { rows: 4, cols: 6, time: 80 },
+  { rows: 6, cols: 6, time: 200 }, { rows: 6, cols: 6, time: 180 }, { rows: 6, cols: 6, time: 160 },
+  { rows: 6, cols: 6, time: 140 }, { rows: 6, cols: 6, time: 120 },
+];
+const SQ_FREE_SIZES = [{ rows: 4, cols: 4 }, { rows: 4, cols: 5 }, { rows: 4, cols: 6 }, { rows: 6, cols: 6 }];
+const SQ_CHALLENGE_HINTS = 3;
+const SQ_FREE_HINTS = 5;
+const SQ_LEVEL_LS = 'shangan_sq_level';
+const SQ_DICT_LS = 'shangan_sq_dict';
+
+/* 默写模式：每日一遍平方数，按天轮换提问方向
+   pattern 0：底数 → 平方数（如 11² = ___）
+   pattern 1：平方数 → 底数（如 121 = ___）
+   pattern 2：混合（逐题随机方向） */
+const sqDictPattern = () => ((dayOfYear(today()) + 1) % 3 + 3) % 3;
+const sqDictPatternName = (p) => ['底数 → 平方数', '平方数 → 底数', '混合模式'][p] || '混合模式';
+
+const sq = {
+  screen: 'menu', mode: 'study',
+  board: [], sel: [], rows: 4, cols: 5,
+  matched: 0, totalPairs: 0, hintsLeft: Infinity,
+  elapsed: 0, timeLimit: 0, remain: 0,
+  paused: false, locked: false, level: 1, timerId: null,
+};
+
+/* 默写模式状态（每日独立） */
+let sqDict = {
+  date: '', pattern: 0, items: [], idx: 0, score: 0, done: false,
+};
+let _sqDictNextTimeout = null;
+
+const stopSqTimer = () => { if (sq.timerId) { clearInterval(sq.timerId); sq.timerId = null; } };
+const resumeSqTimer = () => {
+  if (sq.screen !== 'game' || sq.timerId) return;
+  sq.timerId = setInterval(() => {
+    if (sq.paused || sq.screen !== 'game') return;
+    sq.elapsed++;
+    if (sq.timeLimit) {
+      sq.remain = sq.timeLimit - sq.elapsed;
+      if (sq.remain <= 0) { sq.remain = 0; paintSqTimer(); stopSqTimer(); sqResult(false); return; }
+    }
+    paintSqTimer();
+  }, 1000);
+};
+
+/* 平方数表弹层 */
+const openSqTable = () => {
+  const body = `<div class="pcf-table sq-table"><div class="pcf-tgrid">${SQ_TABLE.map(([b, s]) => `
+      <div class="pcf-tcell"><span>${escapeHtml(b)}</span><span class="eq">=</span><span>${escapeHtml(s)}</span></div>`).join('')}</div></div>`;
+  pcfOverlay('📖 常用平方数表', body);
+};
+
+/* 闯关 / 自由选择弹层 */
+const openSqChallenge = () => {
+  const best = sqBestLevel();
+  const body = `<div class="pcf-levels">${SQ_LEVELS.map((lv, i) => {
+    const n = i + 1, locked = n > best;
+    const own = i < 5 ? '4×4' : (i < 10 ? '4×6' : '6×6');
+    return `<button type="button" class="pcf-level${locked ? ' locked' : ''}" data-lv="${n}" ${locked ? 'disabled' : ''}>
+      <b>第 ${n} 关</b><span>${own} · ${fmtMS(lv.time)}</span>${locked ? '<i>🔒</i>' : ''}
+    </button>`;
+  }).join('')}</div>
+  <div class="muted" style="margin-top:.7em;font-size:.85em">闯关模式：每关提示 3 次，限时内消完全部配对即过关。</div>`;
+  pcfOverlay('🚩 闯关模式 · 选择关卡', body, (ov) => {
+    ov.querySelectorAll('.pcf-level:not(.locked)').forEach(b => b.addEventListener('click', () => {
+      startSqGame('challenge', { level: parseInt(b.dataset.lv, 10) });
+    }));
+  });
+};
+
+const openSqFreePicker = () => {
+  const body = `<div class="pcf-sizes">${SQ_FREE_SIZES.map(s => `
+    <button type="button" class="pcf-size" data-r="${s.rows}" data-c="${s.cols}">
+      <b>${s.rows} × ${s.cols}</b><span>${s.rows * s.cols} 格 · ${s.rows * s.cols / 2} 对</span>
+    </button>`).join('')}</div>
+  <div class="muted" style="margin-top:.7em;font-size:.85em">自由模式：不限时间，每局提示 5 次。</div>`;
+  pcfOverlay('🔲 自由模式 · 选择棋盘', body, (ov) => {
+    ov.querySelectorAll('.pcf-size').forEach(b => b.addEventListener('click', () => {
+      startSqGame('free', { rows: +b.dataset.r, cols: +b.dataset.c });
+    }));
+  });
+};
+
+/* 关卡进度 */
+const sqBestLevel = () => {
+  try { return Math.max(1, Math.min(SQ_LEVELS.length + 1, parseInt(localStorage.getItem(SQ_LEVEL_LS) || '1', 10) || 1)); }
+  catch (_) { return 1; }
+};
+const sqSaveBest = (n) => {
+  try { if (n > sqBestLevel() && n <= SQ_LEVELS.length + 1) localStorage.setItem(SQ_LEVEL_LS, String(n)); } catch (_) {}
+};
+
+/* ---------- 默写模式 ---------- */
+const normalizeSquareAnswer = (s) => String(s || '').trim().replace(/\s+/g, '');
+const normalizeBaseAnswer = (s) => String(s || '').trim().replace(/\s+/g, '').replace(/\^2/g, '²').replace(/的平方/g, '²');
+
+const sqDictLoad = () => {
+  try {
+    const raw = localStorage.getItem(SQ_DICT_LS);
+    if (raw) sqDict = { ...sqDict, ...JSON.parse(raw) };
+  } catch (_) {}
+};
+const sqDictSave = () => {
+  try { localStorage.setItem(SQ_DICT_LS, JSON.stringify(sqDict)); } catch (_) {}
+};
+
+const sqDictBuildItems = () => {
+  const pattern = sqDictPattern();
+  const items = shuffle(SQ_POOL.slice()).map(({ base, square }) => {
+    const baseNum = base.replace(/²$/, '');
+    let askBase;
+    if (pattern === 0) askBase = true;
+    else if (pattern === 1) askBase = false;
+    else askBase = Math.random() > 0.5;
+    return {
+      base, square, baseNum,
+      prompt: askBase ? base : square,
+      answer: askBase ? normalizeSquareAnswer(square) : normalizeBaseAnswer(base),
+      askBase,
+      input: '', correct: false, tried: false,
+    };
+  });
+  sqDict = { date: today(), pattern, items, idx: 0, score: 0, done: false };
+  sqDictSave();
+};
+
+const startSqDict = () => {
+  sqDictLoad();
+  if (sqDict.date !== today()) sqDictBuildItems();
+  else if (!sqDict.items.length) sqDictBuildItems();
+  sq.screen = 'dict';
+  closePcfOverlay();
+  renderSqDict();
+};
+
+const renderSqDict = () => {
+  if (_sqDictNextTimeout) { clearTimeout(_sqDictNextTimeout); _sqDictNextTimeout = null; }
+  const root = $('#toolSquareRoot'); if (!root) return;
+  const cur = sqDict.items[sqDict.idx];
+  const total = sqDict.items.length;
+  const progress = total ? Math.round((sqDict.idx / total) * 100) : 0;
+  if (!cur || sqDict.done) { sqDictFinish(); return; }
+  root.innerHTML = `
+    <div class="pcf-dict">
+      <div class="pcf-hud">
+        <span class="pcf-hud-mode">✍️ 默写模式 · ${sqDictPatternName(sqDict.pattern)}</span>
+        <span class="pcf-hud-info">第 ${sqDict.idx + 1} / ${total} 题 · 已答对 ${sqDict.score} 题</span>
+      </div>
+      <div class="pcf-dict-progress"><div class="pcf-dict-bar" style="width:${progress}%"></div></div>
+      <div class="pcf-dict-card">
+        <div class="pcf-dict-q">${escapeHtml(cur.prompt)} <span class="pcf-dict-eq">=</span></div>
+        <div class="pcf-dict-input-wrap">
+          <input type="text" inputmode="text" class="pcf-dict-input" id="sqDictInput" value="${escapeAttr(cur.input)}" placeholder="在此输入答案" autocomplete="off">
+        </div>
+        <div class="pcf-dict-tip" id="sqDictTip"></div>
+      </div>
+      <div class="pcf-dict-actions">
+        <button type="button" class="primary-btn" id="sqDictSubmit">提交答案</button>
+        <button type="button" class="ghost-btn" id="sqDictSkip">跳过</button>
+        <button type="button" class="ghost-btn" id="sqDictExit">返回</button>
+      </div>
+      <div class="pcf-dict-hint">提示：直接按回车即可提交；平方数方向直接写数字（如 121），底数方向可写 11²、11^2 或 11。</div>
+    </div>`;
+  const input = $('#sqDictInput');
+  input.focus();
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkSqDict(); });
+  $('#sqDictSubmit').addEventListener('click', checkSqDict);
+  $('#sqDictSkip').addEventListener('click', () => {
+    if (_sqDictNextTimeout) { clearTimeout(_sqDictNextTimeout); _sqDictNextTimeout = null; }
+    sqDict.idx = Math.min(sqDict.items.length, sqDict.idx + 1);
+    if (sqDict.idx >= sqDict.items.length) sqDict.done = true;
+    sqDictSave(); renderSqDict();
+  });
+  $('#sqDictExit').addEventListener('click', () => { if (_sqDictNextTimeout) { clearTimeout(_sqDictNextTimeout); _sqDictNextTimeout = null; } sq.screen = 'menu'; renderToolSquare(); });
+};
+
+const checkSqDict = () => {
+  const cur = sqDict.items[sqDict.idx];
+  if (!cur) return;
+  const inputEl = $('#sqDictInput');
+  const raw = inputEl.value;
+  const val = cur.askBase ? normalizeSquareAnswer(raw) : normalizeBaseAnswer(raw);
+  cur.input = raw;
+  cur.tried = true;
+  const tip = $('#sqDictTip');
+  const ok = cur.askBase ? (val === cur.answer) : (val === cur.answer || val === cur.baseNum);
+  if (ok) {
+    cur.correct = true;
+    sqDict.score++;
+    tip.className = 'pcf-dict-tip ok';
+    tip.innerHTML = `✅ 正确！<b>${escapeHtml(cur.prompt)} = ${escapeHtml(cur.askBase ? cur.square : cur.base)}</b>`;
+  } else {
+    tip.className = 'pcf-dict-tip bad';
+    tip.innerHTML = `❌ 正确答案：<b>${escapeHtml(cur.prompt)} = ${escapeHtml(cur.askBase ? cur.square : cur.base)}</b>`;
+  }
+  inputEl.disabled = true;
+  $('#sqDictSubmit').disabled = true;
+  $('#sqDictSkip').textContent = '下一题 →';
+  $('#sqDictSkip').focus();
+  sqDictSave();
+  if (_sqDictNextTimeout) { clearTimeout(_sqDictNextTimeout); _sqDictNextTimeout = null; }
+  _sqDictNextTimeout = setTimeout(() => {
+    _sqDictNextTimeout = null;
+    sqDict.idx = Math.min(sqDict.items.length, sqDict.idx + 1);
+    if (sqDict.idx >= sqDict.items.length) sqDict.done = true;
+    sqDictSave();
+    renderSqDict();
+  }, 900);
+};
+
+const sqDictFinish = () => {
+  const root = $('#toolSquareRoot'); if (!root) return;
+  const total = sqDict.items.length;
+  const wrong = sqDict.items.filter(i => !i.correct);
+  const perfect = wrong.length === 0;
+  root.innerHTML = `
+    <div class="pcf-dict-result">
+      <div class="pcf-dict-result-ico">${perfect ? '🎉' : '✍️'}</div>
+      <div class="pcf-dict-result-title">${perfect ? '全对啦，平方数已刻进 DNA！' : '今日默写完成'}</div>
+      <div class="pcf-dict-result-score">${sqDict.score} / ${total}</div>
+      <div class="pcf-dict-result-sub">${wrong.length ? `错了 ${wrong.length} 题，已标红，建议再默写一遍` : '明天继续加油 ✨'}</div>
+      ${wrong.length ? `<div class="pcf-dict-wrong"><b>错题回顾</b>${wrong.map(i => `
+        <div class="pcf-dict-wrong-row"><span>${escapeHtml(i.prompt)}</span><span>${escapeHtml(i.askBase ? i.square : i.base)}</span></div>`).join('')}</div>` : ''}
+      <div class="pcf-dict-result-actions">
+        <button type="button" class="primary-btn" id="sqDictReplay">再来一遍</button>
+        <button type="button" class="ghost-btn" id="sqDictBackMenu">返回</button>
+      </div>
+    </div>`;
+  $('#sqDictReplay').addEventListener('click', sqDictReset);
+  $('#sqDictBackMenu').addEventListener('click', () => { sq.screen = 'menu'; renderToolSquare(); });
+};
+
+const sqDictReset = () => {
+  sqDictBuildItems();
+  renderSqDict();
+};
+
+/* ---------- 开局 / 渲染 ---------- */
+const startSqGame = (mode, opts = {}) => {
+  let rows, cols, timeLimit, hints;
+  if (mode === 'study') { rows = 4; cols = 5; timeLimit = 0; hints = Infinity; }
+  else if (mode === 'free') { rows = opts.rows || 4; cols = opts.cols || 5; timeLimit = 0; hints = SQ_FREE_HINTS; }
+  else {
+    const lv = SQ_LEVELS[Math.min(SQ_LEVELS.length, opts.level || 1) - 1];
+    rows = lv.rows; cols = lv.cols; timeLimit = lv.time; hints = SQ_CHALLENGE_HINTS;
+  }
+  const pairs = Math.floor(rows * cols / 2);
+  const chosen = shuffle(SQ_POOL.slice()).slice(0, Math.min(pairs, SQ_POOL.length));
+  const board = [];
+  chosen.forEach((c, i) => {
+    board.push({ pairId: i, kind: 'base', text: c.base, done: false, wrong: false, hint: false });
+    board.push({ pairId: i, kind: 'square', text: c.square, done: false, wrong: false, hint: false });
+  });
+  Object.assign(sq, {
+    screen: 'game', mode, board: shuffle(board), sel: [], rows, cols,
+    matched: 0, totalPairs: chosen.length, hintsLeft: hints, elapsed: 0,
+    timeLimit, remain: timeLimit, paused: false, locked: false, level: opts.level || 1,
+  });
+  closePcfOverlay();
+  stopSqTimer();
+  renderSqGame();
+  resumeSqTimer();
+};
+
+const renderSqGame = () => {
+  const root = $('#toolSquareRoot'); if (!root) return;
+  const modeName = { study: '📖 学习模式', challenge: '🚩 闯关模式', free: '🔲 自由模式' }[sq.mode] || '';
+  root.innerHTML = `
+    <div class="pcf-game">
+      <div class="pcf-hud">
+        <span class="pcf-hud-mode">${modeName}</span>
+        <span class="pcf-hud-info" id="sqHudInfo"></span>
+      </div>
+      <div class="pcf-topbar">
+        <button type="button" class="pcf-pause" id="sqPause" title="暂停">⏸</button>
+        <div class="pcf-timer" id="sqTimer">00:00</div>
+        <button type="button" class="pcf-exit" id="sqExit" title="返回">✕</button>
+      </div>
+      <div class="pcf-board" id="sqBoard" style="grid-template-columns:repeat(${sq.cols},minmax(0,1fr))"></div>
+      <div class="pcf-bottombar">
+        <button type="button" class="pcf-tool" id="sqHint"><span class="pcf-tool-ico">💡</span><span class="pcf-tool-txt">提示</span><i class="pcf-badge" id="sqHintBadge"></i></button>
+        <button type="button" class="pcf-tool" id="sqTableBtn"><span class="pcf-tool-ico">📖</span><span class="pcf-tool-txt">平方数表</span></button>
+      </div>
+    </div>`;
+  paintSqBoard();
+  paintSqTimer();
+  paintSqHintBadge();
+  $('#sqPause').addEventListener('click', sqTogglePause);
+  $('#sqExit').addEventListener('click', () => { stopSqTimer(); sq.screen = 'menu'; sq.board = []; closePcfOverlay(); renderToolSquare(); });
+  $('#sqHint').addEventListener('click', sqHint);
+  $('#sqTableBtn').addEventListener('click', openSqTable);
+};
+
+const paintSqTimer = () => {
+  const el = $('#sqTimer'); if (!el) return;
+  if (sq.timeLimit) { el.textContent = fmtMS(sq.remain); el.classList.toggle('low', sq.remain <= 15); }
+  else { el.textContent = fmtMS(sq.elapsed); el.classList.remove('low'); }
+};
+const paintSqHintBadge = () => {
+  const el = $('#sqHintBadge'); if (!el) return;
+  if (sq.hintsLeft === Infinity) { el.textContent = '∞'; el.classList.remove('zero'); }
+  else { el.textContent = String(Math.max(0, sq.hintsLeft)); el.classList.toggle('zero', sq.hintsLeft <= 0); }
+};
+const paintSqBoard = () => {
+  const el = $('#sqBoard'); if (!el) return;
+  el.innerHTML = sq.board.map((t, i) => {
+    const cls = ['pcf-tile', t.kind === 'base' ? 'sq-base' : 'sq-square'];
+    if (t.done) cls.push('done');
+    if (sq.sel.includes(i)) cls.push('sel');
+    if (t.wrong) cls.push('wrong');
+    if (t.hint) cls.push('hint');
+    return `<button type="button" class="${cls.join(' ')}" data-i="${i}"${t.done ? ' disabled' : ''}>${escapeHtml(t.text)}</button>`;
+  }).join('');
+  el.querySelectorAll('.pcf-tile:not([disabled])').forEach(b => b.addEventListener('click', () => sqTap(+b.dataset.i)));
+  const info = $('#sqHudInfo');
+  if (info) info.textContent = sq.mode === 'challenge'
+    ? `第 ${sq.level} / ${SQ_LEVELS.length} 关 · 已完成 ${sq.matched}/${sq.totalPairs} 对`
+    : `已完成 ${sq.matched} / ${sq.totalPairs} 对`;
+};
+
+/* ---------- 交互 ---------- */
+const sqTap = (i) => {
+  if (sq.locked || sq.paused || sq.screen !== 'game') return;
+  const t = sq.board[i];
+  if (!t || t.done) return;
+  if (sq.sel.includes(i)) { sq.sel = sq.sel.filter(x => x !== i); paintSqBoard(); return; }
+  sq.sel.push(i);
+  paintSqBoard();
+  if (sq.sel.length < 2) return;
+  const a = sq.sel[0], b = sq.sel[1];
+  const ta = sq.board[a], tb = sq.board[b];
+  if (ta.pairId === tb.pairId && ta.kind !== tb.kind) {
+    ta.done = tb.done = true;
+    sq.sel = [];
+    sq.matched++;
+    paintSqBoard();
+    if (sq.matched === sq.totalPairs) {
+      sq.locked = true;
+      if (sq.mode === 'challenge') sqSaveBest(sq.level + 1);
+      setTimeout(() => sqResult(true), 340);
+    }
+  } else {
+    sq.locked = true;
+    ta.wrong = tb.wrong = true;
+    paintSqBoard();
+    setTimeout(() => {
+      ta.wrong = tb.wrong = false;
+      sq.sel = [];
+      sq.locked = false;
+      paintSqBoard();
+    }, 480);
+  }
+};
+
+const sqHint = () => {
+  if (sq.paused || sq.locked || sq.screen !== 'game') return;
+  if (sq.hintsLeft <= 0) { toast('本局提示次数已用完'); return; }
+  const byPair = {};
+  sq.board.forEach((t, i) => { if (!t.done) (byPair[t.pairId] = byPair[t.pairId] || []).push(i); });
+  const key = Object.keys(byPair).find(k => byPair[k].length === 2);
+  if (key == null) return;
+  const idxs = byPair[key];
+  if (sq.hintsLeft !== Infinity) sq.hintsLeft--;
+  idxs.forEach(i => { sq.board[i].hint = true; });
+  sq.sel = [];
+  paintSqBoard(); paintSqHintBadge();
+  setTimeout(() => { idxs.forEach(i => { if (sq.board[i]) sq.board[i].hint = false; }); paintSqBoard(); }, 1500);
+};
+
+const sqTogglePause = () => {
+  if (sq.screen !== 'game') return;
+  sq.paused = true;
+  pcfOverlay('⏸ 已暂停', `<div class="pcf-paused">
+      <p class="muted">已用时 ${fmtMS(sq.elapsed)}${sq.timeLimit ? ' · 剩余 ' + fmtMS(sq.remain) : ''}</p>
+      <div class="modal-actions">
+        <button type="button" class="primary-btn" id="sqResume">继续</button>
+        <button type="button" class="ghost-btn" id="sqQuit">退出本局</button>
+      </div>
+    </div>`, () => {
+    $('#sqResume').addEventListener('click', () => { closePcfOverlay(); sq.paused = false; });
+    $('#sqQuit').addEventListener('click', () => { closePcfOverlay(); stopSqTimer(); sq.screen = 'menu'; sq.board = []; renderToolSquare(); });
+  });
+};
+
+const sqResult = (win) => {
+  stopSqTimer();
+  sq.locked = true;
+  const left = sq.totalPairs - sq.matched;
+  const title = win ? '🎉 全部消除！' : '⏰ 时间到';
+  const big = win ? `用时 ${fmtMS(sq.elapsed)}` : `还剩 ${left} 对未消`;
+  const sub = sq.mode === 'challenge'
+    ? `第 ${sq.level} / ${SQ_LEVELS.length} 关 · 提示剩余 ${Math.max(0, sq.hintsLeft)} 次`
+    : `提示剩余：${sq.hintsLeft === Infinity ? '不限' : Math.max(0, sq.hintsLeft)} 次`;
+  let actions;
+  if (win && sq.mode === 'challenge' && sq.level < SQ_LEVELS.length) {
+    actions = `<button type="button" class="primary-btn" id="sqNextLv">下一关 →</button>
+               <button type="button" class="ghost-btn" id="sqBackMenu">返回</button>`;
+  } else {
+    actions = `<button type="button" class="primary-btn" id="sqReplay">再来一局</button>
+               <button type="button" class="ghost-btn" id="sqBackMenu">返回</button>`;
+  }
+  pcfOverlay(title, `<div class="pcf-result">
+      <p class="pcf-result-big">${big}</p>
+      <p class="muted">${sub}</p>
+      <div class="modal-actions">${actions}</div>
+    </div>`, () => {
+    const nx = $('#sqNextLv');
+    if (nx) nx.addEventListener('click', () => startSqGame('challenge', { level: sq.level + 1 }));
+    const rp = $('#sqReplay');
+    if (rp) rp.addEventListener('click', () => startSqGame(sq.mode, { level: sq.level, rows: sq.rows, cols: sq.cols }));
+    $('#sqBackMenu').addEventListener('click', () => { closePcfOverlay(); sq.screen = 'menu'; sq.board = []; renderToolSquare(); });
+  });
+};
+
+/* ---------- 模式选择 ---------- */
+const renderToolSquare = () => {
+  const root = $('#toolSquareRoot'); if (!root) return;
+  if (sq.screen === 'game' && sq.board.length) { renderSqGame(); resumeSqTimer(); return; }
+  if (sq.screen === 'dict') {
+    sqDictLoad();
+    if (sqDict.date === today() && sqDict.items.length && !sqDict.done) { renderSqDict(); return; }
+    if (sqDict.date === today() && sqDict.done) { sqDictFinish(); return; }
+  }
+  sq.screen = 'menu';
+  const best = sqBestLevel();
+  const cleared = Math.min(SQ_LEVELS.length, Math.max(0, sqBestLevel() - 1));
+  const todayPat = sqDictPattern();
+  const patText = ['今日：底数→平方数', '今日：平方数→底数', '今日：混合'][todayPat];
+  root.innerHTML = `
+    <div class="pcf-modes">
+      <button type="button" class="pcf-mode-card pink" data-mode="dictation">
+        <span class="pcf-mode-ico">✍️</span>
+        <span class="pcf-mode-txt"><b>默写模式</b><em>每日一遍平方数 · ${patText} · 共 ${SQ_POOL.length} 题</em></span>
+      </button>
+      <button type="button" class="pcf-mode-card orange" data-mode="study">
+        <span class="pcf-mode-ico">📖</span>
+        <span class="pcf-mode-txt"><b>学习模式</b><em>自由练习，提示次数不限，成绩不计入排行榜</em></span>
+      </button>
+      <button type="button" class="pcf-mode-card green" data-mode="challenge">
+        <span class="pcf-mode-ico">🚩</span>
+        <span class="pcf-mode-txt"><b>闯关模式</b><em>15 关 · 三种棋盘，限时挑战${cleared > 0 ? ` · 已通关 ${cleared} 关` : ''}</em></span>
+      </button>
+      <button type="button" class="pcf-mode-card blue" data-mode="free">
+        <span class="pcf-mode-ico">🔲</span>
+        <span class="pcf-mode-txt"><b>自由模式</b><em>自选格子数，不限时练习</em></span>
+      </button>
+      <div class="pcf-modes-foot">
+        <button type="button" class="pcf-table-link" id="sqTableBtn2">📖 查看常用平方数表</button>
+      </div>
+    </div>`;
+  root.querySelectorAll('.pcf-mode-card').forEach(b => b.addEventListener('click', () => {
+    const mode = b.dataset.mode;
+    if (mode === 'dictation') startSqDict();
+    else if (mode === 'free') openSqFreePicker();
+    else if (mode === 'challenge') openSqChallenge();
+    else startSqGame('study');
+  }));
+  $('#sqTableBtn2').addEventListener('click', openSqTable);
+};
+
+/* ---------- 4) 每日时政：标签筛选 + 收藏 ---------- */
 const POLITICS_ITEMS = [
   { id: 'p1', date: '2026-09-08', tag: '会议', title: '中共中央政治局召开会议，研究部署下半年经济工作，强调稳中求进、提振内需。' },
   { id: 'p2', date: '2026-09-07', tag: '科技', title: '我国新一代量子计算原型机取得突破，量子比特数进一步提升。' },
@@ -2652,7 +3129,7 @@ const renderToolPolitics = () => {
   }));
 };
 
-/* ---------- 3) 年均增长率练习：r = (B/A)^(1/n) − 1 四选一 ---------- */
+/* ---------- 5) 年均增长率练习：r = (B/A)^(1/n) − 1 四选一 ---------- */
 const toolGrowth = { score: 0, total: 0 };
 const renderToolGrowth = () => {
   const root = $('#toolGrowthRoot'); if (!root) return;
@@ -2698,7 +3175,7 @@ const renderToolGrowth = () => {
   $('#tgNext').addEventListener('click', renderToolGrowth);
 };
 
-/* ---------- 4) 截面图练习：立体图形截面可视化 + 四选一 ---------- */
+/* ---------- 6) 截面图练习：立体图形截面可视化 + 四选一 ---------- */
 const SECTION_PUZZLES = [
   { type: 'cylinder', name: '圆柱', cut: '水平', ans: '圆' },
   { type: 'cylinder', name: '圆柱', cut: '竖直', ans: '矩形' },

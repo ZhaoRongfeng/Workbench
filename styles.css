@@ -1023,6 +1023,11 @@ textarea.text-input { border-radius: var(--radius-sm); resize: vertical; }
 .pcf-mode-card.green  { background: linear-gradient(135deg, #9BD98B, #5FBB6A); }
 .pcf-mode-card.blue   { background: linear-gradient(135deg, #87BAE9, #5C97D6); }
 .pcf-mode-card.pink   { background: linear-gradient(135deg, #FF9EB5, #F06C8A); }
+
+/* 平方数游戏：底数 / 平方数 两种 tile 配色 */
+.pcf-tile.sq-base { background: linear-gradient(135deg, #B08BD6, #8A6AC4); }
+.pcf-tile.sq-square { background: linear-gradient(135deg, #F0B872, #E09545); }
+.sq-table .pcf-tgrid { grid-template-columns: repeat(5, 1fr); }
 .pcf-mode-ico { flex: 0 0 auto; width: 2.7em; height: 2.7em; border-radius: 50%; background: rgba(255,255,255,.24); display: flex; align-items: center; justify-content: center; font-size: 1.15em; }
 .pcf-mode-txt { display: flex; flex-direction: column; gap: .15em; }
 .pcf-mode-txt b { font-size: 1.24em; font-weight: 800; letter-spacing: .02em; }
