@@ -2146,6 +2146,7 @@ let pcfDict = {
   score: 0,           // 当前答对数
   done: false,        // 是否已完成
 };
+let _pcfDictNextTimeout = null;
 
 const fmtMS = (s) => {
   s = Math.max(0, Math.floor(s));
@@ -2280,6 +2281,7 @@ const startPcfDict = () => {
 };
 
 const renderPcfDict = () => {
+  if (_pcfDictNextTimeout) { clearTimeout(_pcfDictNextTimeout); _pcfDictNextTimeout = null; }
   const root = $('#toolPercentRoot'); if (!root) return;
   const cur = pcfDict.items[pcfDict.idx];
   const total = pcfDict.items.length;
@@ -2314,10 +2316,12 @@ const renderPcfDict = () => {
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkPcfDict(); });
   $('#pcfDictSubmit').addEventListener('click', checkPcfDict);
   $('#pcfDictSkip').addEventListener('click', () => {
+    if (_pcfDictNextTimeout) { clearTimeout(_pcfDictNextTimeout); _pcfDictNextTimeout = null; }
     pcfDict.idx = Math.min(pcfDict.items.length, pcfDict.idx + 1);
+    if (pcfDict.idx >= pcfDict.items.length) pcfDict.done = true;
     pcfDictSave(); renderPcfDict();
   });
-  $('#pcfDictExit').addEventListener('click', () => { pcf.screen = 'menu'; renderToolPercent(); });
+  $('#pcfDictExit').addEventListener('click', () => { if (_pcfDictNextTimeout) { clearTimeout(_pcfDictNextTimeout); _pcfDictNextTimeout = null; } pcf.screen = 'menu'; renderToolPercent(); });
 };
 
 const checkPcfDict = () => {
@@ -2344,7 +2348,9 @@ const checkPcfDict = () => {
   $('#pcfDictSkip').focus();
   pcfDictSave();
   // 自动进入下一题
-  setTimeout(() => {
+  if (_pcfDictNextTimeout) { clearTimeout(_pcfDictNextTimeout); _pcfDictNextTimeout = null; }
+  _pcfDictNextTimeout = setTimeout(() => {
+    _pcfDictNextTimeout = null;
     pcfDict.idx = Math.min(pcfDict.items.length, pcfDict.idx + 1);
     if (pcfDict.idx >= pcfDict.items.length) pcfDict.done = true;
     pcfDictSave();
