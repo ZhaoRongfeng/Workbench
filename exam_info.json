@@ -56,7 +56,7 @@
     ]
   },
   {
-    "id": "info-tj-4a45673f7e9e4842aad1ba09ef0824e7-10306831",
+    "id": "info-tj-4a45673f7e9e4842aad1ba09ef0824e7-9360941",
     "title": "辽宁选调宣讲会",
     "category": "辽宁",
     "subcategory": "宣讲会",
@@ -73,6 +73,34 @@
       "time": "2026年9月16日，15:30",
       "location": "四平路校"
     }
+  },
+  {
+    "id": "info-tj-8d0a5fdcc8174d8b9e0bbf2eaaaca587",
+    "title": "【湖南选调】湖南省2027年定向选调公告",
+    "category": "湖南",
+    "subcategory": "选调",
+    "date": "2026-09-20",
+    "content": "﻿【学校推荐流程】（1）意向学生仔细阅读公告内容，对照报考须知有关要求，下载打印《报名推荐表》，真实",
+    "links": [
+      {
+        "label": "原文链接",
+        "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=8d0a5fdcc8174d8b9e0bbf2eaaaca587"
+      }
+    ]
+  },
+  {
+    "id": "info-tj-91e920f436c14f1fa002d28b888165e9",
+    "title": "【甘肃选调】甘肃省2027年选调应届优秀大学毕业生公告",
+    "category": "其他",
+    "subcategory": "选调",
+    "date": "2026-09-20",
+    "content": "【学校推荐流程】（1）意向学生仔细阅读公告内容，对照报考须知有关要求，下载打印《报名推荐表》，真实、",
+    "links": [
+      {
+        "label": "原文链接",
+        "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=91e920f436c14f1fa002d28b888165e9"
+      }
+    ]
   },
   {
     "id": "info-tj-205c8f15d0b640599709c3667ebda40b",
