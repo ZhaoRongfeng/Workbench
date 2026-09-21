@@ -1,7 +1,9 @@
 name: 每日抓取考试汇总
 
 # 每天北京时间 15:17 自动抓取同济就业网 + 各官网公告，生成 exam_info.json 并提交，
-# 触发 Pages 重新部署 → 线上「考试汇总」每天自动更新。
+# 提交后直接部署 Pages → 线上「考试汇总」每天自动更新。
+# 注意：用 GITHUB_TOKEN 的 push 不会触发其他 workflow，因此抓取后不再依赖 deploy.yml，
+# 而是本 workflow 自己完成 Pages 部署。
 on:
   schedule:
     - cron: '17 7 * * *'   # UTC 07:17 = 北京时间 15:17
@@ -9,6 +11,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: fetch-exam-info
@@ -17,6 +21,9 @@ concurrency:
 jobs:
   fetch:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,9 +32,11 @@ jobs:
         run: python3 fetch_exam_info.py --out exam_info.json
 
       - name: 提交（仅在内容变化时）
+        id: commit
         run: |
           if [ -z "$(git status --porcelain exam_info.json)" ]; then
             echo "无变化，跳过提交"
+            echo "committed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name "github-actions[bot]"
@@ -35,3 +44,19 @@ jobs:
           git add exam_info.json
           git commit -m "chore: 每日更新考试汇总 $(date +'%Y-%m-%d')"
           git push
+          echo "committed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Pages
+        if: steps.commit.outputs.committed == 'true'
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages artifact
+        if: steps.commit.outputs.committed == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        if: steps.commit.outputs.committed == 'true'
+        id: deployment
+        uses: actions/deploy-pages@v4
