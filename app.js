@@ -3086,7 +3086,7 @@ const renderToolSquare = () => {
 };
 
 /* ---------- 4) 每日时政：标签筛选 + 收藏 ---------- */
-const POLITICS_ITEMS = [
+const POLITICS_ITEMS = (typeof HANDBOOK_POINTS !== 'undefined' ? HANDBOOK_POINTS : []).concat([
   { id: 'p1', date: '2026-09-08', tag: '会议', title: '中共中央政治局召开会议，研究部署下半年经济工作，强调稳中求进、提振内需。' },
   { id: 'p2', date: '2026-09-07', tag: '科技', title: '我国新一代量子计算原型机取得突破，量子比特数进一步提升。' },
   { id: 'p3', date: '2026-09-06', tag: '民生', title: '多地出台生育支持政策，扩大普惠托育供给、发放育儿补贴。' },
@@ -3099,7 +3099,7 @@ const POLITICS_ITEMS = [
   { id: 'p10', date: '2026-08-30', tag: '会议', title: '中央财经委员会会议研究促进共同富裕、优化收入分配格局。' },
   { id: 'p11', date: '2026-08-29', tag: '生态', title: '全国碳市场扩容，更多高排放行业纳入配额管理。' },
   { id: 'p12', date: '2026-08-28', tag: '国际', title: '第三届"一带一路"科技交流大会召开，推动创新合作。' },
-];
+]);
 const loadPoliticsFav = () => { try { return new Set(JSON.parse(localStorage.getItem('shangan_politics_fav') || '[]')); } catch (_) { return new Set(); } };
 const savePoliticsFav = (set) => { try { localStorage.setItem('shangan_politics_fav', JSON.stringify(Array.from(set))); } catch (_) {} };
 let politicsFilter = '全部';
@@ -3127,6 +3127,106 @@ const renderToolPolitics = () => {
     if (f.has(b.dataset.id)) f.delete(b.dataset.id); else f.add(b.dataset.id);
     savePoliticsFav(f); renderToolPolitics();
   }));
+};
+
+/* ---------- 4b) 时政手册阅读模块：目录 + 全文 + 搜索 ---------- */
+let handbookData = null;
+let handbookCur = 'ch-求是';
+let handbookQ = '';
+let handbookTag = '全部';
+
+const renderToolHandbook = () => {
+  const root = $('#toolHandbookRoot'); if (!root) return;
+  if (handbookData) return;   // 骨架已建，不重复渲染
+  root.innerHTML = '<div class="muted" style="padding:20px">⏳ 正在加载时政手册…</div>';
+  if (location.protocol === 'file:') {
+    root.innerHTML = '<div class="muted" style="padding:20px">📕 手册为外部数据文件，请通过线上地址或本地服务器（如 <code>python3 -m http.server</code>）打开本工作台以加载。</div>';
+    return;
+  }
+  fetch('./politics_handbook.json', { cache: 'no-cache' })
+    .then(r => r.json())
+    .then(d => { handbookData = d; handbookCur = d.chapters[0].id; buildHandbook(root); })
+    .catch(() => { root.innerHTML = '<div class="muted" style="padding:20px">⚠️ 加载失败，请检查网络或稍后重试。</div>'; });
+};
+
+const buildHandbook = (root) => {
+  const chapters = handbookData.chapters;
+  root.innerHTML = `
+    <div class="hb-toolbar">
+      <input id="hbSearch" class="hb-search" type="text" placeholder="🔍 搜索手册内容（标题 / 正文）">
+      <select id="hbTag" class="hb-tag">
+        <option value="全部">全部章节</option>
+        ${chapters.map(c => `<option value="${c.tag}">${c.tag}</option>`).join('')}
+      </select>
+    </div>
+    <div class="hb-layout">
+      <nav class="hb-toc">
+        ${chapters.map(c => `<button class="hb-toc-item" data-ch="${c.id}"><span>${escapeHtml(c.title)}</span><span class="hb-toc-num">${c.entries.length}</span></button>`).join('')}
+      </nav>
+      <div class="hb-content" id="hbContent"></div>
+    </div>`;
+  $('#hbSearch').addEventListener('input', (e) => {
+    handbookQ = e.target.value.trim(); handbookTag = '全部'; $('#hbTag').value = '全部';
+    updateHandbookContent();
+  });
+  $('#hbTag').addEventListener('change', (e) => {
+    handbookTag = e.target.value;
+    if (handbookTag !== '全部') {
+      const c = chapters.find(x => x.tag === handbookTag);
+      if (c) handbookCur = c.id;
+      handbookQ = ''; $('#hbSearch').value = '';
+    }
+    updateHandbookContent();
+  });
+  root.querySelectorAll('.hb-toc-item').forEach(b => b.addEventListener('click', () => {
+    handbookCur = b.dataset.ch; handbookQ = ''; handbookTag = '全部';
+    $('#hbTag').value = '全部'; $('#hbSearch').value = '';
+    updateHandbookContent();
+  }));
+  updateHandbookContent();
+};
+
+const updateHandbookContent = () => {
+  const d = handbookData; if (!d) return;
+  const content = $('#hbContent'); if (!content) return;
+  const q = handbookQ, chapters = d.chapters;
+  content.parentElement.querySelectorAll('.hb-toc-item').forEach(b =>
+    b.classList.toggle('active', !q && b.dataset.ch === handbookCur));
+  let html = '';
+  if (q) {
+    const res = [];
+    chapters.forEach(c => c.entries.forEach(e => {
+      if ((e.title + '\n' + e.paras.join('\n')).includes(q)) res.push({ c, e });
+    }));
+    html = `<div class="hb-search-count">找到 ${res.length} 条匹配「${escapeHtml(q)}」</div>`;
+    html += res.length ? res.map(({ c, e }) => hbEntryHtml(c, e, q)).join('')
+                       : '<div class="muted" style="padding:16px">没有匹配内容</div>';
+  } else {
+    const c = chapters.find(x => x.id === handbookCur) || chapters[0];
+    html = `<h3 class="hb-ch-title">${escapeHtml(c.title)}（${c.entries.length} 条）</h3>`
+         + c.entries.map(e => hbEntryHtml(c, e, '')).join('');
+  }
+  content.innerHTML = html;
+  content.scrollTop = 0;
+};
+
+const hbEntryHtml = (c, e, q) => {
+  const paras = e.paras.map(p => `<p>${hl(p, q)}</p>`).join('');
+  const date = e.date ? `<span class="hb-entry-date">${e.date}</span>` : '';
+  const tag = `<span class="info-tag tg-${c.tag}">${c.tag}</span>`;
+  return `<div class="hb-entry">
+    <div class="hb-entry-head">${tag}${date}<b class="hb-entry-title">${hl(e.title, q)}</b></div>
+    <div class="hb-entry-body">${paras}</div>
+  </div>`;
+};
+
+const hl = (text, q) => {
+  let s = escapeHtml(text);
+  if (q) {
+    const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+    s = s.replace(re, m => `<mark>${m}</mark>`);
+  }
+  return s;
 };
 
 /* ---------- 5) 年均增长率练习：r = (B/A)^(1/n) − 1 四选一 ---------- */

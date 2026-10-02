@@ -1102,6 +1102,48 @@ textarea.text-input { border-radius: var(--radius-sm); resize: vertical; }
 .tg-经济 { background: #fff0c2; color: #9a7b00; }
 .tg-生态 { background: #d6efd0; color: #3c7a2e; }
 .tg-国际 { background: #e7dcff; color: #6b46c1; }
+.tg-求是 { background: #ffd9e2; color: #c23b6b; }
+.tg-党政 { background: #d7e9ff; color: #2a5db0; }
+.tg-热点 { background: #ffd6a5; color: #a35a00; }
+.tg-新法 { background: #d9f5e3; color: #2e7d5b; }
+
+/* ===== 时政手册阅读模块 ===== */
+.hb-toolbar { display: flex; gap: 0.6em; position: sticky; top: 0; z-index: 5;
+  background: var(--surface, #fff); padding: 0.7em 0.2em; }
+.hb-search { flex: 1; padding: 0.55em 0.8em; border: 1.5px solid var(--border, #e6ddcb);
+  border-radius: 12px; font-size: 0.95em; background: #fffdf8; }
+.hb-search:focus { outline: none; border-color: var(--accent, #f0993e); }
+.hb-tag { padding: 0.55em 0.6em; border: 1.5px solid var(--border, #e6ddcb);
+  border-radius: 12px; background: #fffdf8; font-size: 0.9em; }
+.hb-layout { display: flex; gap: 1em; align-items: flex-start; }
+.hb-toc { flex: 0 0 11em; display: flex; flex-direction: column; gap: 0.45em;
+  position: sticky; top: 3.4em; }
+.hb-toc-item { display: flex; justify-content: space-between; align-items: center; gap: 0.5em;
+  padding: 0.6em 0.7em; border: 1.5px solid var(--border, #e6ddcb); border-radius: 12px;
+  background: #fffdf8; cursor: pointer; font-size: 0.9em; color: var(--text); text-align: left; }
+.hb-toc-item.active { background: var(--accent, #f0993e); color: #fff; border-color: var(--accent, #f0993e); }
+.hb-toc-num { font-size: 0.78em; opacity: 0.7; background: rgba(0,0,0,0.06); border-radius: 8px;
+  padding: 0.05em 0.45em; }
+.hb-toc-item.active .hb-toc-num { background: rgba(255,255,255,0.25); opacity: 0.9; }
+.hb-content { flex: 1; min-width: 0; }
+.hb-search-count { color: var(--text-weak, #8a8268); font-size: 0.88em; margin: 0.2em 0 0.8em; }
+.hb-ch-title { font-size: 1.05em; color: var(--text-strong); margin: 0 0 0.7em; }
+.hb-entry { background: #fffdf8; border: 1.5px solid var(--border, #e6ddcb); border-radius: 14px;
+  padding: 0.85em 1em; margin-bottom: 0.85em; }
+.hb-entry-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5em; margin-bottom: 0.45em; }
+.hb-entry-date { font-size: 0.8em; color: var(--text-weak, #8a8268); }
+.hb-entry-title { font-size: 0.98em; color: var(--text-strong); line-height: 1.4; }
+.hb-entry-body p { margin: 0 0 0.55em; line-height: 1.75; font-size: 0.92em; color: var(--text); }
+.hb-entry-body p:last-child { margin-bottom: 0; }
+.hb-content mark { background: #ffe48a; color: #5a4500; border-radius: 4px; padding: 0 2px; }
+
+@media (max-width: 900px) {
+  .hb-layout { flex-direction: column; }
+  .hb-toc { flex: none; flex-direction: row; overflow-x: auto; gap: 0.4em; top: 3.2em;
+    padding-bottom: 0.3em; }
+  .hb-toc-item { flex: 0 0 auto; white-space: nowrap; }
+  .hb-toc-num { display: none; }
+}
 .info-card-body { font-size: 0.9em; line-height: 1.7; color: var(--text); margin-bottom: 0.6em; }
 .info-card-links { display: flex; flex-wrap: wrap; gap: 0.4em; margin-bottom: 0.6em; }
 .info-link {
