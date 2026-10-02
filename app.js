@@ -179,7 +179,7 @@ const ROUTES = [
   'politics', 'common-sense', 'language', 'logic',
   'quantity', 'data-analysis', 'stats',
   'shenlun-small', 'shenlun-big', 'errors', 'exam-info',
-  'tool-percent', 'tool-politics', 'tool-growth', 'tool-section', 'tool-square'
+  'tool-percent', 'tool-politics', 'tool-growth', 'tool-section', 'tool-square', 'tool-handbook'
 ];
 const MODULE_ROUTES = ['politics','common-sense','language','logic','quantity','data-analysis','shenlun-small','shenlun-big'];
 const ROUTE_CAT = {
@@ -222,6 +222,7 @@ const onEnter = (route) => {
     case 'tool-growth': renderToolGrowth(); break;
     case 'tool-section': renderToolSection(); break;
     case 'tool-square': renderToolSquare(); break;
+    case 'tool-handbook': renderToolHandbook(); break;
   }
   if (MODULE_ROUTES.includes(route)) renderModuleHeader(route);
 };
