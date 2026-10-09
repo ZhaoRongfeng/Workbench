@@ -35,39 +35,16 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
 
 BASE_TJ = "https://tj91.tongji.edu.cn"
 
-# 固定公告页（作为兜底/补充）
+# 固定公告页（仅保留统考核心、且同济就业网抓不到的「国考」作为提醒位；
+# 其余省份（上海/湖北/河南等）的真实公告已由同济就业网抓取覆盖，不再重复占位）
 FIXED_SOURCES = [
     {
-        "id": "info-shanghai-xuandiao-2026",
-        "title": "2027上海市选调公告",
-        "category": "上海",
-        "subcategory": "选调",
-        "url": "https://shacs.gov.cn/",
-        "position_url": "https://shacs.gov.cn/",
-    },
-    {
         "id": "info-guokao-2026",
-        "title": "2027年度国考公告",
+        "title": "2027年度国考公告（国家公务员局）",
         "category": "国考",
         "subcategory": "国考",
         "url": "http://www.scs.gov.cn/gkIndex.html",
         "position_url": "http://www.scs.gov.cn/gkIndex.html",
-    },
-    {
-        "id": "info-hubei-xuandiao-2026",
-        "title": "2027湖北省选调公告",
-        "category": "湖北",
-        "subcategory": "选调",
-        "url": "http://www.hbsrsksy.cn/",
-        "position_url": "http://www.hbsrsksy.cn/",
-    },
-    {
-        "id": "info-henan-shengkao-2026",
-        "title": "2027河南省考公告",
-        "category": "河南",
-        "subcategory": "省考",
-        "url": "http://www.hnrsks.com/sitesources/hnsrskszx/page_pc/ksxxnew/index.html",
-        "position_url": "http://www.hnrsks.com/sitesources/hnsrskszx/page_pc/ksxxnew/index.html",
     },
 ]
 
@@ -309,7 +286,7 @@ def build(pages):
 def main():
     ap = argparse.ArgumentParser(description="抓取考试公告/宣讲会 → exam_info.json")
     ap.add_argument("--out", default="exam_info.json", help="输出文件路径")
-    ap.add_argument("--pages", type=int, default=2, help="抓同济列表前 N 页（默认 2）")
+    ap.add_argument("--pages", type=int, default=3, help="抓同济列表前 N 页（默认 3）")
     args = ap.parse_args()
 
     print("开始抓取考试信息 ...")

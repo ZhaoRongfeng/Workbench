@@ -1,25 +1,11 @@
 [
   {
-    "id": "info-shanghai-xuandiao-2026",
-    "title": "上海市公务员局",
-    "category": "上海",
-    "subcategory": "选调",
-    "date": "",
-    "content": "上海市公务员局公告信息，详情请访问官网。",
-    "links": [
-      {
-        "label": "公告原文",
-        "url": "https://shacs.gov.cn/"
-      }
-    ]
-  },
-  {
     "id": "info-guokao-2026",
-    "title": "2027年度国考公告",
+    "title": "2027年度国考公告（国家公务员局）",
     "category": "国考",
     "subcategory": "国考",
     "date": "",
-    "content": "2027年度国考公告公告信息，详情请访问官网。",
+    "content": "2027年度国考公告（国家公务员局）公告信息，详情请访问官网。",
     "links": [
       {
         "label": "公告原文",
@@ -28,35 +14,7 @@
     ]
   },
   {
-    "id": "info-hubei-xuandiao-2026",
-    "title": "2027湖北省选调公告",
-    "category": "湖北",
-    "subcategory": "选调",
-    "date": "",
-    "content": "2027湖北省选调公告公告信息，详情请访问官网。",
-    "links": [
-      {
-        "label": "公告原文",
-        "url": "http://www.hbsrsksy.cn/"
-      }
-    ]
-  },
-  {
-    "id": "info-henan-shengkao-2026",
-    "title": "Document",
-    "category": "河南",
-    "subcategory": "省考",
-    "date": "",
-    "content": "Document公告信息，详情请访问官网。",
-    "links": [
-      {
-        "label": "公告原文",
-        "url": "http://www.hnrsks.com/sitesources/hnsrskszx/page_pc/ksxxnew/index.html"
-      }
-    ]
-  },
-  {
-    "id": "info-tj-4a45673f7e9e4842aad1ba09ef0824e7-10398583",
+    "id": "info-tj-4a45673f7e9e4842aad1ba09ef0824e7-14469152",
     "title": "辽宁选调宣讲会",
     "category": "辽宁",
     "subcategory": "宣讲会",
@@ -73,6 +31,34 @@
       "time": "2026年9月16日，15:30",
       "location": "四平路校"
     }
+  },
+  {
+    "id": "info-tj-3cb2c7c7195149a58326a2112c7ae8c3",
+    "title": "【安徽选调】安徽省2027年度面向同济大学定向招录选调生公告",
+    "category": "安徽",
+    "subcategory": "选调",
+    "date": "2026-10-09",
+    "content": "【校内推荐流程】1.登录报名网站打印《安徽省2027年度定向选调生报名推荐表》，先到院系党委审核盖章",
+    "links": [
+      {
+        "label": "原文链接",
+        "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=3cb2c7c7195149a58326a2112c7ae8c3"
+      }
+    ]
+  },
+  {
+    "id": "info-tj-3371cc18caa440409784444222ba0dab",
+    "title": "【浙江选调】2027年度浙江省党政机关选调应届优秀大学毕业生公告",
+    "category": "浙江",
+    "subcategory": "选调",
+    "date": "2026-10-08",
+    "content": "﻿2027年度浙江省党政机关选调应届优秀大学毕业生公告仅在校园网内发布，登陆后查看，请勿擅自转发他人",
+    "links": [
+      {
+        "label": "原文链接",
+        "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=3371cc18caa440409784444222ba0dab"
+      }
+    ]
   },
   {
     "id": "info-tj-ebb2caf31dfb46ed95cc2ef551fa0f8f",
