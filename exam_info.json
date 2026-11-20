@@ -42,20 +42,6 @@
     ]
   },
   {
-    "id": "info-tj-eb588ec8647345918cb4ed14bc319376",
-    "title": "【青海选调】青海省2027年度选调应届优秀大学毕业生公告",
-    "category": "其他",
-    "subcategory": "选调",
-    "date": "2026-11-03",
-    "content": "校内审核流程：1.认真阅读公告，确认符合报考条件。2.完整填写公告所述《推荐报名表》，一式两份，A4",
-    "links": [
-      {
-        "label": "原文链接",
-        "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=eb588ec8647345918cb4ed14bc319376"
-      }
-    ]
-  },
-  {
     "id": "info-tj-adb6380063e94fe2942e7a62c027d216",
     "title": "吉林省面向同济大学定向招录2027届选调生公告",
     "category": "其他",
@@ -168,6 +154,20 @@
     ]
   },
   {
+    "id": "info-tj-eb588ec8647345918cb4ed14bc319376",
+    "title": "【青海选调】青海省2027年度选调应届优秀大学毕业生公告",
+    "category": "其他",
+    "subcategory": "选调",
+    "date": "2026-11-03",
+    "content": "校内审核流程：1.认真阅读公告，确认符合报考条件。2.完整填写公告所述《推荐报名表》，一式两份，A4",
+    "links": [
+      {
+        "label": "原文链接",
+        "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=eb588ec8647345918cb4ed14bc319376"
+      }
+    ]
+  },
+  {
     "id": "info-tj-74a196ac867c411694ab15194098c097",
     "title": "辽宁省2027年度选调 应届优秀大学毕业生公告",
     "category": "辽宁",
@@ -262,161 +262,6 @@
       {
         "label": "原文链接",
         "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=3cb2c7c7195149a58326a2112c7ae8c3"
-      }
-    ]
-  },
-  {
-    "id": "info-tj-3371cc18caa440409784444222ba0dab",
-    "title": "【浙江选调】2027年度浙江省党政机关选调应届优秀大学毕业生公告",
-    "category": "浙江",
-    "subcategory": "选调",
-    "date": "2026-10-08",
-    "content": "﻿2027年度浙江省党政机关选调应届优秀大学毕业生公告仅在校园网内发布，登陆后查看，请勿擅自转发他人",
-    "links": [
-      {
-        "label": "原文链接",
-        "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=3371cc18caa440409784444222ba0dab"
-      }
-    ]
-  },
-  {
-    "id": "info-tj-ebb2caf31dfb46ed95cc2ef551fa0f8f",
-    "title": "【重庆选调】重庆市面向同济大学定向选调2027届急需紧缺专业应届优秀大学毕业生简章",
-    "category": "重庆",
-    "subcategory": "选调",
-    "date": "2026-10-08",
-    "content": "﻿【同济大学专场宣讲会】时间：10月15日（周四）14:30-16:30地点：四平路校区经纬楼三楼演",
-    "links": [
-      {
-        "label": "原文链接",
-        "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=ebb2caf31dfb46ed95cc2ef551fa0f8f"
-      }
-    ],
-    "talk": {
-      "title": "同济大学专场宣讲会",
-      "time": "10月15日（周四）14:30-16:30",
-      "location": "四平路校区经纬楼三楼演"
-    }
-  },
-  {
-    "id": "info-tj-0a316f7b26bb4bf78d0986add7d6c9b7",
-    "title": "【山东选调】山东省2027年度选拔录用选调生公告（含宣讲会信息）",
-    "category": "山东",
-    "subcategory": "选调",
-    "date": "2026-10-08",
-    "content": "﻿【同济大学专场宣讲会】时间：10月12日（周一）15:30地点：四平路校区中法中心C201宣讲会报",
-    "links": [
-      {
-        "label": "原文链接",
-        "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=0a316f7b26bb4bf78d0986add7d6c9b7"
-      }
-    ],
-    "talk": {
-      "title": "同济大学专场宣讲会",
-      "time": "10月12日（周一）15:30",
-      "location": "四平路校区中法中心C201宣讲会报"
-    }
-  },
-  {
-    "id": "info-tj-9b9fcf57cf7c4e7f847a13d4111b438e",
-    "title": "【四川选调】四川省面向同济大学选调2027届优秀大学毕业生公告",
-    "category": "四川",
-    "subcategory": "选调",
-    "date": "2026-09-20",
-    "content": "﻿【同济大学专场宣讲会】时间：9月22日（周二）15:00地点：四平路校区中法中心C201【校内推荐",
-    "links": [
-      {
-        "label": "原文链接",
-        "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=9b9fcf57cf7c4e7f847a13d4111b438e"
-      }
-    ],
-    "talk": {
-      "title": "同济大学专场宣讲会",
-      "time": "9月22日（周二）15:00",
-      "location": "四平路校区中法中心C201"
-    }
-  },
-  {
-    "id": "info-tj-8d0a5fdcc8174d8b9e0bbf2eaaaca587",
-    "title": "【湖南选调】湖南省2027年定向选调公告",
-    "category": "湖南",
-    "subcategory": "选调",
-    "date": "2026-09-20",
-    "content": "﻿【学校推荐流程】（1）意向学生仔细阅读公告内容，对照报考须知有关要求，下载打印《报名推荐表》，真实",
-    "links": [
-      {
-        "label": "原文链接",
-        "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=8d0a5fdcc8174d8b9e0bbf2eaaaca587"
-      }
-    ]
-  },
-  {
-    "id": "info-tj-91e920f436c14f1fa002d28b888165e9",
-    "title": "【甘肃选调】甘肃省2027年选调应届优秀大学毕业生公告",
-    "category": "其他",
-    "subcategory": "选调",
-    "date": "2026-09-20",
-    "content": "【学校推荐流程】（1）意向学生仔细阅读公告内容，对照报考须知有关要求，下载打印《报名推荐表》，真实、",
-    "links": [
-      {
-        "label": "原文链接",
-        "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=91e920f436c14f1fa002d28b888165e9"
-      }
-    ]
-  },
-  {
-    "id": "info-tj-205c8f15d0b640599709c3667ebda40b",
-    "title": "【北京选调】北京市2027年度定向选调和“优培计划”招聘应届优秀大学毕业生公告",
-    "category": "北京",
-    "subcategory": "选调",
-    "date": "2026-09-14",
-    "content": "预计2027届毕业生，北京市2027年度定向选调已发布公告，意向报考北京市选调生的同学请仔细阅读公告",
-    "links": [
-      {
-        "label": "原文链接",
-        "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=205c8f15d0b640599709c3667ebda40b"
-      }
-    ]
-  },
-  {
-    "id": "info-tj-fc48e268840b4cc3a8aa99e9744e1faa",
-    "title": "武汉市2027年选聘生管培生招聘公告",
-    "category": "其他",
-    "subcategory": "公告",
-    "date": "2026-09-14",
-    "content": "﻿武汉市2027年选聘生管培生招聘公告为加强干部队伍优质来源建设，从源头上提高干部队伍整体素质，优化",
-    "links": [
-      {
-        "label": "原文链接",
-        "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=fc48e268840b4cc3a8aa99e9744e1faa"
-      }
-    ]
-  },
-  {
-    "id": "info-tj-c2a334d33342465e814ad02252a6db0b",
-    "title": "【湖北选调】湖北省面向同济大学定向选调（选聘）2027届优秀大学毕业生公告",
-    "category": "湖北",
-    "subcategory": "选调",
-    "date": "2026-09-10",
-    "content": "﻿湖北省面向同济大学定向选调（选聘）2027届优秀大学毕业生公告为进一步加强湖北省干部队伍优质源头建",
-    "links": [
-      {
-        "label": "原文链接",
-        "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=c2a334d33342465e814ad02252a6db0b"
-      }
-    ]
-  },
-  {
-    "id": "info-tj-dc00d0fdfad54f25aa532e4d25267164",
-    "title": "【上海选调】上海市2027年度选调应届优秀大学毕业生公告",
-    "category": "上海",
-    "subcategory": "选调",
-    "date": "2026-09-09",
-    "content": "﻿上海市2027年度选调应届优秀大学毕业生公告为进一步加强上海高素质专业化干部队伍建设，现决定在部分",
-    "links": [
-      {
-        "label": "原文链接",
-        "url": "https://tj91.tongji.edu.cn/frontpage/tongji/html/newsDetail.html?id=dc00d0fdfad54f25aa532e4d25267164"
       }
     ]
   }
